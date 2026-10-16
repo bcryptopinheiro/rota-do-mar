@@ -390,12 +390,39 @@ html.sem-scroll{overflow:hidden}
 .leg-row .corr{grid-column:2; font-size:14px; font-weight:700; color:var(--bad)}
 .dev-pts{font-size:14px}
 
+
+/* ---------- Início: Continuar, modo relaxar, plano e secções que abrem ---------- */
+.continuar{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; width:100%; text-align:left; border:none; border-radius:20px; padding:18px; background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow); transition:transform .15s}
+.continuar:active{transform:scale(.98)}
+.ct-i{width:52px; height:52px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.2); font-size:20px; padding-left:3px}
+.ct-tx{display:flex; flex-direction:column; gap:3px; min-width:0}
+.ct-t{font-family:var(--f-display); font-size:22px; line-height:1.15}
+.ct-d{font-size:15px; opacity:.9}
+.relax-row{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-top:-8px}
+.relax{border:2px solid var(--line); background:var(--surface); border-radius:99px; padding:9px 14px; min-height:44px; font-size:15px; font-weight:700}
+.relax.on{border-color:var(--sky); background:var(--accent-soft)}
+.plano{background:var(--surface); border-radius:var(--r); box-shadow:var(--shadow); padding:14px 16px; display:flex; flex-direction:column; gap:8px; font-size:16px; border-left:5px solid var(--gold)}
+.pl-t{font-family:var(--f-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.pl-row{display:flex; gap:8px; flex-wrap:wrap}
+.pl-row input{flex:1 1 160px; min-height:48px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; padding:8px 10px}
+.plano .link-b{align-self:flex-start; padding:0}
+.dobra{background:var(--surface); border-radius:var(--r); box-shadow:var(--shadow)}
+.dobra summary{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:14px 16px; min-height:52px; cursor:pointer; list-style:none; font-family:var(--f-display); font-size:19px}
+.dobra summary::-webkit-details-marker{display:none}
+.dobra summary::after{content:"+"; font-family:var(--f-mono); font-size:20px; color:var(--accent); margin-left:auto}
+.dobra[open] summary::after{content:"–"}
+.dobra summary .pct{margin-left:auto}
+.dobra-c{padding:0 16px 16px; font-size:15px}
+.passos-m{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:6px}
+#fundo{transition:opacity .6s ease}
+body.foco #fundo{opacity:calc(var(--fundo-op) * .3)}
+
 /* ---------- Fundo animado (bolhas do mar) ---------- */
 #fundo{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:var(--fundo-op)}
 #app{position:relative; z-index:1}
-.com-fundo :is(.q,.mini,.res,.player,.mundo,.acao:not(.final):not(.estudo),.reset-b,.sp-card,.face,.hero,.rodape,.playbar,.mini-b:not(.on)){background:var(--glass); -webkit-backdrop-filter:blur(12px) saturate(1.15); backdrop-filter:blur(12px) saturate(1.15)}
+.com-fundo :is(.q,.mini,.res,.player,.mundo,.acao:not(.final):not(.estudo),.reset-b,.sp-card,.face,.hero,.rodape,.playbar,.mini-b:not(.on),.plano,.dobra,.relax:not(.on)){background:var(--glass); -webkit-backdrop-filter:blur(12px) saturate(1.15); backdrop-filter:blur(12px) saturate(1.15)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .com-fundo :is(.q,.mini,.res,.player,.mundo,.acao:not(.final):not(.estudo),.reset-b,.sp-card,.face,.hero,.rodape,.playbar,.mini-b:not(.on)){background:var(--surface)}
+  .com-fundo :is(.q,.mini,.res,.player,.mundo,.acao:not(.final):not(.estudo),.reset-b,.sp-card,.face,.hero,.rodape,.playbar,.mini-b:not(.on),.plano,.dobra,.relax:not(.on)){background:var(--surface)}
 }
 .com-fundo .mundo:disabled{opacity:.88}
 .com-fundo .hero{border-radius:20px; padding:16px}
@@ -419,7 +446,8 @@ html.sem-scroll{overflow:hidden}
    - Completa a frase:  { id:'m2-32', m:2, t:'completa', q:'Frase com ___ no sítio da palavra', o:['CERTA','errada',...], e:'...' }
    - Com documento:     acrescenta doc:'nome' (um dos CONTEUDO.documentos ou CONTEUDO.figuras): aparece por cima da pergunta.
    A primeira opção de "o" é sempre a certa (as opções são baralhadas no jogo).
-   "m" é o número do mundo (1–7). Cada id tem de ser único.
+   "m" é o número do mundo (1–7) e "s" é a secção da lição desse mundo onde a matéria é explicada
+   (a pergunta só aparece no mundo depois dessa parte da matéria). Cada id tem de ser único.
    destaque:true = pergunta essencial; o teste final inclui sempre pelo menos
    "testeFinal.minDestaque" perguntas destas.
    ===================================================================== */
@@ -746,220 +774,220 @@ const CONTEUDO = {
 
   perguntas: [
     /* ---------------- Mundo 1: zonas marítimas, ZEE e plataforma ---------------- */
-    { id:'m1-01', m:1, t:'mc', destaque:true, q:'O mar territorial estende-se até…', o:['12 milhas náuticas a partir da linha de base','24 milhas náuticas a partir da linha de base','200 milhas náuticas a partir da linha de base','200 metros de profundidade'], e:'O mar territorial vai até às 12 mn, medidas a partir da linha de base (linha da baixa-mar).' },
-    { id:'m1-02', m:1, t:'mc', destaque:true, q:'A Zona Económica Exclusiva (ZEE) estende-se…', o:['desde o limite do mar territorial até às 200 milhas náuticas','das 12 às 24 milhas náuticas','da linha de base até às 12 milhas náuticas','até aos 200 m de profundidade'], e:'A ZEE começa no limite do mar territorial (12 mn) e vai até às 200 mn.' },
-    { id:'m1-03', m:1, t:'mc', q:'Na zona contígua, o Estado costeiro pode…', o:['fiscalizar para prevenir ou reprimir infrações às suas leis','exercer soberania total sobre o espaço aéreo','explorar só o subsolo marinho','proibir a passagem de qualquer navio'], e:'Na zona contígua (12 a 24 mn), o Estado pode exercer fiscalização sobre infrações às suas leis.' },
-    { id:'m1-04', m:1, t:'mc', q:'Em que zona marítima o Estado tem soberania sobre o solo e subsolo marinhos, a coluna de água e o espaço aéreo?', o:['Mar territorial','Zona contígua','ZEE','Alto mar'], e:'É no mar territorial (até 12 mn) que a soberania do Estado é total.' },
-    { id:'m1-05', m:1, t:'mc', q:'Na ZEE, o Estado costeiro tem direitos de…', o:['exploração, investigação e gestão dos recursos naturais','soberania total, como em terra','fiscalização aduaneira apenas','controlo só do espaço aéreo'], e:'Na ZEE o Estado tem direitos de exploração, investigação e gestão dos recursos naturais.' },
-    { id:'m1-06', m:1, t:'mc', q:'Uma milha náutica corresponde a…', o:['1,852 km','1 km','1,609 km','2 km'], e:'1 mn = 1,852 km (o manual dá esta nota no Doc. 1 da p. 242).' },
-    { id:'m1-07', m:1, t:'mc', q:'A CNUDM é…', o:['a Convenção das Nações Unidas sobre o Direito do Mar, assinada em 1982','um programa português de gestão da orla costeira','o fundo europeu que apoia a pesca','o organismo que gere as lotas'], e:'A CNUDM (1982) define as regras da soberania dos Estados sobre as águas e a gestão dos recursos marinhos.' },
-    { id:'m1-08', m:1, t:'mc', destaque:true, q:'A plataforma continental, no sentido geológico, é…', o:['a parte submersa da placa continental, com profundidade máxima de 200 m','a faixa de mar até às 200 milhas náuticas','o fundo do mar a mais de 2000 m de profundidade','a zona onde o Estado pode fiscalizar infrações'], e:'No sentido geológico, é a parte submersa da placa continental, até cerca de 200 m de profundidade.' },
-    { id:'m1-09', m:1, t:'mc', destaque:true, q:'O que distingue a ZEE da plataforma continental no sentido jurídico?', o:['Na ZEE há direitos sobre o fundo, a água e o ar; na plataforma jurídica só sobre o solo e o subsolo','Na ZEE só há direitos sobre o fundo; na plataforma jurídica sobre a água','São a mesma coisa com nomes diferentes','A plataforma jurídica acaba sempre nas 12 mn'], e:'A plataforma continental jurídica abrange só o leito e o subsolo; a ZEE inclui também a coluna de água e o espaço aéreo.' },
-    { id:'m1-10', m:1, t:'mc', q:'A ZEE portuguesa divide-se em três áreas:', o:['Continente, Açores e Madeira','Norte, Centro e Sul','Mar territorial, zona contígua e alto mar','Atlântico, Mediterrâneo e Índico'], e:'A ZEE reparte-se por Continente, Açores e Madeira.' },
-    { id:'m1-11', m:1, t:'mc', q:'Se a proposta de alargamento da plataforma continental for aprovada pela ONU…', o:['97% do território português passará a ser mar','Portugal perde a ZEE dos Açores','o mar territorial passa para 24 mn','Portugal deixa de poder pescar fora da ZEE'], e:'O manual (p. 243) diz que, se aprovada, 97% do território português passará a ser mar, com direito exclusivo à exploração dos recursos do fundo.' },
-    { id:'m1-12', m:1, t:'mc', q:'A proposta portuguesa de alargamento da plataforma continental para lá das 200 mn foi apresentada à ONU em…', o:['2009, e reformulada em 2017','1982, e reformulada em 2009','2017, e aprovada em 2021','1986, quando Portugal entrou na CEE'], e:'Foi apresentada em 2009 e reformulada em 2017 (manual, p. 243).' },
-    { id:'m1-13', m:1, t:'mc', q:'Duas atividades que podem ganhar potencial com o alargamento da plataforma continental são…', o:['a exploração de recursos minerais do fundo e a biotecnologia marinha','o turismo de neve e a agricultura','a pesca de rio e a salicultura no interior','a construção de barragens e a pecuária'], e:'O alargamento dá direitos sobre o solo e subsolo marinhos: recursos minerais, biotecnologia, investigação.' },
-    { id:'m1-14', m:1, t:'vf', q:'A zona contígua vai das 12 às 24 milhas náuticas.', a:true, e:'Verdadeiro: a zona contígua fica entre o fim do mar territorial (12 mn) e as 24 mn.' },
-    { id:'m1-15', m:1, t:'vf', q:'Na ZEE, o Estado costeiro tem soberania total, tal como no mar territorial.', a:false, e:'Falso: na ZEE tem direitos de exploração, investigação e gestão dos recursos, não soberania total.' },
-    { id:'m1-16', m:1, t:'vf', q:'As distâncias das zonas marítimas medem-se a partir da linha de base, que corresponde à linha da baixa-mar.', a:true, e:'Verdadeiro: a linha de base é a linha da baixa-mar (maré baixa).' },
-    { id:'m1-17', m:1, t:'vf', q:'A plataforma continental, no sentido jurídico, inclui a coluna de água.', a:false, e:'Falso: inclui só o leito (solo) e o subsolo marinhos.' },
-    { id:'m1-18', m:1, t:'vf', q:'Segundo o manual, Portugal é o Estado costeiro da União Europeia com maior extensão de zonas marítimas.', a:true, e:'Verdadeiro (manual, p. 242).' },
-    { id:'m1-19', m:1, t:'vf', q:'A plataforma continental geológica pode chegar aos 2000 m de profundidade.', a:false, e:'Falso: no sentido geológico, a profundidade máxima é de 200 m.' },
-    { id:'m1-20', m:1, t:'completa', q:'O mar territorial vai até às ___ milhas náuticas.', o:['12','24','200','6'], e:'O mar territorial vai até às 12 mn: aí o Estado tem soberania sobre o fundo, a água e o espaço aéreo.' },
-    { id:'m1-21', m:1, t:'completa', q:'A ZEE termina nas ___ milhas náuticas.', o:['200','24','12','350'], e:'A ZEE vai do limite do mar territorial até às 200 mn (cerca de 370 km).' },
-    { id:'m1-22', m:1, t:'completa', q:'Na ___, o Estado pode fiscalizar infrações às suas leis entre as 12 e as 24 mn.', o:['zona contígua','ZEE','plataforma continental','linha de base'], e:'Zona contígua: das 12 às 24 mn, o Estado pode fiscalizar para prevenir ou reprimir infrações às suas leis.' },
-    { id:'m1-23', m:1, t:'mc', q:'Analisa as afirmações:\nI. O mar territorial inclui o espaço aéreo sobrejacente.\nII. A zona contígua começa na linha de base.\nIII. A ZEE inclui o solo e o subsolo marinhos e a coluna de água.\nIV. A plataforma continental jurídica pode ir para lá das 200 mn.\nSeleciona a opção correta.', o:['I, III e IV','I e II','II e III','II, III e IV'], e:'II é falsa: a zona contígua começa nas 12 mn. As outras estão certas.' },
-    { id:'m1-24', m:1, t:'mc', doc:'zonas', q:'No esquema, o número 2 corresponde à…', o:['zona contígua','zona económica exclusiva','plataforma continental','linha de base'], e:'Da costa para o largo: 1 mar territorial, 2 zona contígua, 3 ZEE, 4 alto mar.' },
+    { id:'m1-01', m:1, s:1, t:'mc', destaque:true, q:'O mar territorial estende-se até…', o:['12 milhas náuticas a partir da linha de base','24 milhas náuticas a partir da linha de base','200 milhas náuticas a partir da linha de base','200 metros de profundidade'], e:'O mar territorial vai até às 12 mn, medidas a partir da linha de base (linha da baixa-mar).' },
+    { id:'m1-02', m:1, s:1, t:'mc', destaque:true, q:'A Zona Económica Exclusiva (ZEE) estende-se…', o:['desde o limite do mar territorial até às 200 milhas náuticas','das 12 às 24 milhas náuticas','da linha de base até às 12 milhas náuticas','até aos 200 m de profundidade'], e:'A ZEE começa no limite do mar territorial (12 mn) e vai até às 200 mn.' },
+    { id:'m1-03', m:1, s:1, t:'mc', q:'Na zona contígua, o Estado costeiro pode…', o:['fiscalizar para prevenir ou reprimir infrações às suas leis','exercer soberania total sobre o espaço aéreo','explorar só o subsolo marinho','proibir a passagem de qualquer navio'], e:'Na zona contígua (12 a 24 mn), o Estado pode exercer fiscalização sobre infrações às suas leis.' },
+    { id:'m1-04', m:1, s:1, t:'mc', q:'Em que zona marítima o Estado tem soberania sobre o solo e subsolo marinhos, a coluna de água e o espaço aéreo?', o:['Mar territorial','Zona contígua','ZEE','Alto mar'], e:'É no mar territorial (até 12 mn) que a soberania do Estado é total.' },
+    { id:'m1-05', m:1, s:1, t:'mc', q:'Na ZEE, o Estado costeiro tem direitos de…', o:['exploração, investigação e gestão dos recursos naturais','soberania total, como em terra','fiscalização aduaneira apenas','controlo só do espaço aéreo'], e:'Na ZEE o Estado tem direitos de exploração, investigação e gestão dos recursos naturais.' },
+    { id:'m1-06', m:1, s:0, t:'mc', q:'Uma milha náutica corresponde a…', o:['1,852 km','1 km','1,609 km','2 km'], e:'1 mn = 1,852 km (o manual dá esta nota no Doc. 1 da p. 242).' },
+    { id:'m1-07', m:1, s:0, t:'mc', q:'A CNUDM é…', o:['a Convenção das Nações Unidas sobre o Direito do Mar, assinada em 1982','um programa português de gestão da orla costeira','o fundo europeu que apoia a pesca','o organismo que gere as lotas'], e:'A CNUDM (1982) define as regras da soberania dos Estados sobre as águas e a gestão dos recursos marinhos.' },
+    { id:'m1-08', m:1, s:2, t:'mc', destaque:true, q:'A plataforma continental, no sentido geológico, é…', o:['a parte submersa da placa continental, com profundidade máxima de 200 m','a faixa de mar até às 200 milhas náuticas','o fundo do mar a mais de 2000 m de profundidade','a zona onde o Estado pode fiscalizar infrações'], e:'No sentido geológico, é a parte submersa da placa continental, até cerca de 200 m de profundidade.' },
+    { id:'m1-09', m:1, s:2, t:'mc', destaque:true, q:'O que distingue a ZEE da plataforma continental no sentido jurídico?', o:['Na ZEE há direitos sobre o fundo, a água e o ar; na plataforma jurídica só sobre o solo e o subsolo','Na ZEE só há direitos sobre o fundo; na plataforma jurídica sobre a água','São a mesma coisa com nomes diferentes','A plataforma jurídica acaba sempre nas 12 mn'], e:'A plataforma continental jurídica abrange só o leito e o subsolo; a ZEE inclui também a coluna de água e o espaço aéreo.' },
+    { id:'m1-10', m:1, s:1, t:'mc', q:'A ZEE portuguesa divide-se em três áreas:', o:['Continente, Açores e Madeira','Norte, Centro e Sul','Mar territorial, zona contígua e alto mar','Atlântico, Mediterrâneo e Índico'], e:'A ZEE reparte-se por Continente, Açores e Madeira.' },
+    { id:'m1-11', m:1, s:2, t:'mc', q:'Se a proposta de alargamento da plataforma continental for aprovada pela ONU…', o:['97% do território português passará a ser mar','Portugal perde a ZEE dos Açores','o mar territorial passa para 24 mn','Portugal deixa de poder pescar fora da ZEE'], e:'O manual (p. 243) diz que, se aprovada, 97% do território português passará a ser mar, com direito exclusivo à exploração dos recursos do fundo.' },
+    { id:'m1-12', m:1, s:2, t:'mc', q:'A proposta portuguesa de alargamento da plataforma continental para lá das 200 mn foi apresentada à ONU em…', o:['2009, e reformulada em 2017','1982, e reformulada em 2009','2017, e aprovada em 2021','1986, quando Portugal entrou na CEE'], e:'Foi apresentada em 2009 e reformulada em 2017 (manual, p. 243).' },
+    { id:'m1-13', m:1, s:2, t:'mc', q:'Duas atividades que podem ganhar potencial com o alargamento da plataforma continental são…', o:['a exploração de recursos minerais do fundo e a biotecnologia marinha','o turismo de neve e a agricultura','a pesca de rio e a salicultura no interior','a construção de barragens e a pecuária'], e:'O alargamento dá direitos sobre o solo e subsolo marinhos: recursos minerais, biotecnologia, investigação.' },
+    { id:'m1-14', m:1, s:1, t:'vf', q:'A zona contígua vai das 12 às 24 milhas náuticas.', a:true, e:'Verdadeiro: a zona contígua fica entre o fim do mar territorial (12 mn) e as 24 mn.' },
+    { id:'m1-15', m:1, s:1, t:'vf', q:'Na ZEE, o Estado costeiro tem soberania total, tal como no mar territorial.', a:false, e:'Falso: na ZEE tem direitos de exploração, investigação e gestão dos recursos, não soberania total.' },
+    { id:'m1-16', m:1, s:0, t:'vf', q:'As distâncias das zonas marítimas medem-se a partir da linha de base, que corresponde à linha da baixa-mar.', a:true, e:'Verdadeiro: a linha de base é a linha da baixa-mar (maré baixa).' },
+    { id:'m1-17', m:1, s:2, t:'vf', q:'A plataforma continental, no sentido jurídico, inclui a coluna de água.', a:false, e:'Falso: inclui só o leito (solo) e o subsolo marinhos.' },
+    { id:'m1-18', m:1, s:0, t:'vf', q:'Segundo o manual, Portugal é o Estado costeiro da União Europeia com maior extensão de zonas marítimas.', a:true, e:'Verdadeiro (manual, p. 242).' },
+    { id:'m1-19', m:1, s:2, t:'vf', q:'A plataforma continental geológica pode chegar aos 2000 m de profundidade.', a:false, e:'Falso: no sentido geológico, a profundidade máxima é de 200 m.' },
+    { id:'m1-20', m:1, s:1, t:'completa', q:'O mar territorial vai até às ___ milhas náuticas.', o:['12','24','200','6'], e:'O mar territorial vai até às 12 mn: aí o Estado tem soberania sobre o fundo, a água e o espaço aéreo.' },
+    { id:'m1-21', m:1, s:1, t:'completa', q:'A ZEE termina nas ___ milhas náuticas.', o:['200','24','12','350'], e:'A ZEE vai do limite do mar territorial até às 200 mn (cerca de 370 km).' },
+    { id:'m1-22', m:1, s:1, t:'completa', q:'Na ___, o Estado pode fiscalizar infrações às suas leis entre as 12 e as 24 mn.', o:['zona contígua','ZEE','plataforma continental','linha de base'], e:'Zona contígua: das 12 às 24 mn, o Estado pode fiscalizar para prevenir ou reprimir infrações às suas leis.' },
+    { id:'m1-23', m:1, s:2, t:'mc', q:'Analisa as afirmações:\nI. O mar territorial inclui o espaço aéreo sobrejacente.\nII. A zona contígua começa na linha de base.\nIII. A ZEE inclui o solo e o subsolo marinhos e a coluna de água.\nIV. A plataforma continental jurídica pode ir para lá das 200 mn.\nSeleciona a opção correta.', o:['I, III e IV','I e II','II e III','II, III e IV'], e:'II é falsa: a zona contígua começa nas 12 mn. As outras estão certas.' },
+    { id:'m1-24', m:1, s:1, t:'mc', doc:'zonas', q:'No esquema, o número 2 corresponde à…', o:['zona contígua','zona económica exclusiva','plataforma continental','linha de base'], e:'Da costa para o largo: 1 mar territorial, 2 zona contígua, 3 ZEE, 4 alto mar.' },
 
     /* ---------------- Mundo 2: linha de costa e ação do mar ---------------- */
-    { id:'m2-01', m:2, t:'mc', destaque:true, q:'No Continente, predomina a costa…', o:['de arriba (rochosa)','de praia (arenosa)','de fajãs','de deltas lávicos'], e:'Segundo o manual, no Continente predomina a costa de arriba, talhada em rochas duras (granito, xisto, calcário).' },
-    { id:'m2-02', m:2, t:'mc', q:'A linha de costa portuguesa tem, no Continente, cerca de…', o:['1200 km','600 km','2600 km','5000 km'], e:'Cerca de 1200 km no Continente e 1360 km nos arquipélagos (cerca de 2600 km no total).' },
-    { id:'m2-03', m:2, t:'mc', destaque:true, q:'Podemos indicar como troços de costa de arriba e de costa de praia, respetivamente:', o:['o barlavento e o sotavento algarvios','o sotavento e o barlavento algarvios','de Espinho a São Pedro de Moel e o barlavento algarvio','o estuário do Tejo e o cabo de São Vicente'], e:'Exercício do manual (p. 254): o barlavento algarvio é costa de arriba; o sotavento é costa de praia.' },
-    { id:'m2-04', m:2, t:'mc', q:'A costa de praia (litoral baixo) é predominante…', o:['de Espinho a São Pedro de Moel','da Nazaré à foz do Tejo','do cabo de Sines ao de São Vicente','no barlavento algarvio'], e:'Litoral baixo: Espinho–São Pedro de Moel, estuário do Tejo, foz do Sado–Sines e sotavento algarvio.' },
-    { id:'m2-05', m:2, t:'mc', q:'A costa de arriba alta e escarpada surge…', o:['do cabo de Sines ao de São Vicente','de Espinho a São Pedro de Moel','no sotavento algarvio','da foz do Sado a Sines'], e:'Arriba alta: Nazaré–foz do Tejo, cabo Espichel–foz do Sado, cabo de Sines–São Vicente e barlavento algarvio.' },
-    { id:'m2-06', m:2, t:'mc', q:'Entre Caminha e Esposende, a costa é…', o:['de arriba baixa ou rochas, numa estreita faixa de costa de emersão','de arriba alta e escarpada de calcário','de praia, com ilhas-barreira','de fajãs e deltas lávicos'], e:'De Caminha a Esposende há arriba baixa ou rochas: uma estreita faixa de costa de emersão.' },
-    { id:'m2-07', m:2, t:'mc', destaque:true, q:'A abrasão marinha é…', o:['a erosão marinha reforçada pelo arremesso de areia e fragmentos rochosos contra as arribas','a acumulação de areias numa praia','o recuo do mar que faz emergir áreas submersas','o transporte de areias ao longo da costa'], e:'Abrasão marinha: as ondas atiram areia e pedras contra a arriba e desgastam-na, como uma lixa.' },
-    { id:'m2-08', m:2, t:'mc', q:'As três etapas da erosão marinha são…', o:['desgaste, transporte e acumulação','emersão, submersão e regressão','evaporação, condensação e precipitação','captura, descarga e venda'], e:'Desgaste (as ondas fragmentam as rochas), transporte (ondas e correntes) e acumulação.' },
-    { id:'m2-09', m:2, t:'mc', destaque:true, q:'Uma arriba morta é uma arriba que…', o:['já não está sujeita à abrasão marinha, porque recuou ou o nível do mar baixou','está em contacto direto com o mar','está a ser desgastada na base','foi construída pelo ser humano'], e:'Arriba morta: deixou de sofrer abrasão marinha.' },
-    { id:'m2-10', m:2, t:'mc', q:'A plataforma de abrasão é…', o:['a faixa entre o mar e a arriba, submersa na maré alta e visível na maré baixa','a zona sempre submersa onde se acumulam fragmentos','a parte de cima da arriba','a parte submersa da placa continental até aos 200 m'], e:'A plataforma de abrasão fica entre o mar e a arriba e emerge na maré baixa.' },
-    { id:'m2-11', m:2, t:'mc', q:'A plataforma de acumulação forma-se com…', o:['fragmentos rochosos acumulados na base da arriba, sempre submersos','areias trazidas pelo vento','lava que arrefeceu ao chegar ao mar','sedimentos dos rios numa laguna'], e:'É a acumulação de fragmentos sempre submersa (D na Fig. 2, p. 246).' },
-    { id:'m2-12', m:2, t:'mc', q:'Os cabos formam-se em rochas…', o:['mais resistentes à abrasão','mais brandas, que recuam depressa','sempre de areia','apenas vulcânicas'], e:'As rochas mais duras recuam mais devagar e ficam salientes: formam cabos.' },
-    { id:'m2-13', m:2, t:'mc', destaque:true, q:'A corrente de deriva litoral é…', o:['uma corrente induzida pela aproximação oblíqua das ondas à praia, que transporta areias ao longo da costa','uma corrente de águas profundas e frias que sobe à superfície','o ramo da corrente do Golfo que passa ao largo de Portugal','um vento forte de norte'], e:'A deriva litoral é provocada pelas ondas que chegam de lado (oblíquas) e transporta areias, poluentes e objetos ao longo da costa.' },
-    { id:'m2-14', m:2, t:'mc', q:'Na costa ocidental portuguesa, a deriva litoral transporta as areias sobretudo…', o:['de norte para sul','de sul para norte','de oeste para este','do mar para os rios'], e:'As ondas chegam de noroeste, por isso a deriva é Norte-Sul: os molhes retêm areia a norte e há menos a sul.' },
-    { id:'m2-15', m:2, t:'mc', q:'Uma transgressão marinha acontece quando…', o:['o mar avança e submerge áreas continentais','o mar recua e áreas submersas emergem','uma arriba deixa de sofrer abrasão','um rio assoreia a sua foz'], e:'Transgressão = o mar avança (costas de submersão). Regressão = o mar recua.' },
-    { id:'m2-16', m:2, t:'mc', q:'Uma costa de emersão é uma área do litoral que…', o:['emergiu por efeito do recuo do mar','foi submersa pelo avanço do mar','foi formada por lava','resulta de uma barragem'], e:'Costa de emersão: emergiu quando o mar recuou (ex.: Caminha–Esposende).' },
-    { id:'m2-17', m:2, t:'mc', q:'Nos Açores e na Madeira predomina…', o:['o litoral de arriba alta, mais irregular','o litoral de praia arenosa','a costa de emersão de granito','as ilhas-barreira'], e:'Nos arquipélagos predomina a arriba alta; as praias são pouco representativas.' },
-    { id:'m2-18', m:2, t:'mc', q:'As restingas e as ilhas-barreira formam-se por…', o:['acumulação de areias transportadas pelo mar, que assoreiam a foz dos rios e reentrâncias','desgaste das arribas pela abrasão','escoadas de lava que arrefecem no mar','subida de águas profundas'], e:'São formas de acumulação: a deriva deposita areias e forma cordões, atrás dos quais ficam lagunas.' },
-    { id:'m2-19', m:2, t:'vf', q:'A costa de praia forma-se em relevo baixo e em rochas mais brandas, como arenitos e argilas.', a:true, e:'Verdadeiro (manual, p. 245).' },
-    { id:'m2-20', m:2, t:'vf', q:'No Continente, a costa de praia ocupa maior extensão do que a costa de arriba.', a:false, e:'Falso: predomina a costa de arriba; a de praia ocupa menor extensão.' },
-    { id:'m2-21', m:2, t:'vf', q:'A abrasão marinha provoca o recuo das arribas vivas.', a:true, e:'Verdadeiro: desgasta a base, a parte de cima desmorona-se e a arriba recua.' },
-    { id:'m2-22', m:2, t:'vf', q:'As enseadas e pequenas baías formam-se nas rochas de maior dureza.', a:false, e:'Falso: formam-se nas rochas de menor dureza, que recuam mais depressa.' },
-    { id:'m2-23', m:2, t:'vf', q:'A linha de costa portuguesa é predominantemente alta e pouco recortada.', a:true, e:'Verdadeiro (manual, p. 244).' },
-    { id:'m2-24', m:2, t:'vf', q:'O desgaste provocado pelo mar é maior nas formações rochosas mais duras.', a:false, e:'Falso: o desgaste é maior nas formações mais brandas.' },
-    { id:'m2-25', m:2, t:'completa', q:'A ___ marinha é a erosão reforçada pelo arremesso de areias e fragmentos contra as arribas.', o:['abrasão','regressão','transgressão','deriva'], e:'Abrasão marinha: as ondas atiram areia e fragmentos contra a arriba e desgastam-na como uma lixa.' },
-    { id:'m2-26', m:2, t:'completa', q:'A arriba que já não sofre abrasão marinha chama-se arriba ___.', o:['morta','viva','baixa','de emersão'], e:'Arriba morta: recuou ou o nível do mar baixou, e o mar já não a desgasta.' },
-    { id:'m2-27', m:2, t:'completa', q:'A corrente de ___ litoral é induzida pela chegada oblíqua das ondas à praia.', o:['deriva','compensação','Portugal','Canárias'], e:'Deriva litoral: as ondas chegam de lado à praia e empurram as areias ao longo da costa.' },
-    { id:'m2-28', m:2, t:'mc', q:'Ordena as etapas do recuo de uma arriba viva:\n1. A parte superior desmorona-se.\n2. A abrasão desgasta a base.\n3. Forma-se a plataforma de abrasão.', o:['2 – 1 – 3','1 – 2 – 3','3 – 2 – 1','2 – 3 – 1'], e:'Primeiro a abrasão desgasta a base, depois a parte de cima cai, e os fragmentos formam a plataforma de abrasão.' },
-    { id:'m2-29', m:2, t:'mc', doc:'arriba', q:'No esquema, o número 2 assinala…', o:['a plataforma de abrasão','a plataforma de acumulação','uma arriba morta','uma restinga'], e:'O 2 é a faixa entre a arriba e o mar, visível na maré baixa: plataforma de abrasão.' },
+    { id:'m2-01', m:2, s:1, t:'mc', destaque:true, q:'No Continente, predomina a costa…', o:['de arriba (rochosa)','de praia (arenosa)','de fajãs','de deltas lávicos'], e:'Segundo o manual, no Continente predomina a costa de arriba, talhada em rochas duras (granito, xisto, calcário).' },
+    { id:'m2-02', m:2, s:0, t:'mc', q:'A linha de costa portuguesa tem, no Continente, cerca de…', o:['1200 km','600 km','2600 km','5000 km'], e:'Cerca de 1200 km no Continente e 1360 km nos arquipélagos (cerca de 2600 km no total).' },
+    { id:'m2-03', m:2, s:1, t:'mc', destaque:true, q:'Podemos indicar como troços de costa de arriba e de costa de praia, respetivamente:', o:['o barlavento e o sotavento algarvios','o sotavento e o barlavento algarvios','de Espinho a São Pedro de Moel e o barlavento algarvio','o estuário do Tejo e o cabo de São Vicente'], e:'Exercício do manual (p. 254): o barlavento algarvio é costa de arriba; o sotavento é costa de praia.' },
+    { id:'m2-04', m:2, s:1, t:'mc', q:'A costa de praia (litoral baixo) é predominante…', o:['de Espinho a São Pedro de Moel','da Nazaré à foz do Tejo','do cabo de Sines ao de São Vicente','no barlavento algarvio'], e:'Litoral baixo: Espinho–São Pedro de Moel, estuário do Tejo, foz do Sado–Sines e sotavento algarvio.' },
+    { id:'m2-05', m:2, s:1, t:'mc', q:'A costa de arriba alta e escarpada surge…', o:['do cabo de Sines ao de São Vicente','de Espinho a São Pedro de Moel','no sotavento algarvio','da foz do Sado a Sines'], e:'Arriba alta: Nazaré–foz do Tejo, cabo Espichel–foz do Sado, cabo de Sines–São Vicente e barlavento algarvio.' },
+    { id:'m2-06', m:2, s:1, t:'mc', q:'Entre Caminha e Esposende, a costa é…', o:['de arriba baixa ou rochas, numa estreita faixa de costa de emersão','de arriba alta e escarpada de calcário','de praia, com ilhas-barreira','de fajãs e deltas lávicos'], e:'De Caminha a Esposende há arriba baixa ou rochas: uma estreita faixa de costa de emersão.' },
+    { id:'m2-07', m:2, s:2, t:'mc', destaque:true, q:'A abrasão marinha é…', o:['a erosão marinha reforçada pelo arremesso de areia e fragmentos rochosos contra as arribas','a acumulação de areias numa praia','o recuo do mar que faz emergir áreas submersas','o transporte de areias ao longo da costa'], e:'Abrasão marinha: as ondas atiram areia e pedras contra a arriba e desgastam-na, como uma lixa.' },
+    { id:'m2-08', m:2, s:2, t:'mc', q:'As três etapas da erosão marinha são…', o:['desgaste, transporte e acumulação','emersão, submersão e regressão','evaporação, condensação e precipitação','captura, descarga e venda'], e:'Desgaste (as ondas fragmentam as rochas), transporte (ondas e correntes) e acumulação.' },
+    { id:'m2-09', m:2, s:2, t:'mc', destaque:true, q:'Uma arriba morta é uma arriba que…', o:['já não está sujeita à abrasão marinha, porque recuou ou o nível do mar baixou','está em contacto direto com o mar','está a ser desgastada na base','foi construída pelo ser humano'], e:'Arriba morta: deixou de sofrer abrasão marinha.' },
+    { id:'m2-10', m:2, s:3, t:'mc', q:'A plataforma de abrasão é…', o:['a faixa entre o mar e a arriba, submersa na maré alta e visível na maré baixa','a zona sempre submersa onde se acumulam fragmentos','a parte de cima da arriba','a parte submersa da placa continental até aos 200 m'], e:'A plataforma de abrasão fica entre o mar e a arriba e emerge na maré baixa.' },
+    { id:'m2-11', m:2, s:3, t:'mc', q:'A plataforma de acumulação forma-se com…', o:['fragmentos rochosos acumulados na base da arriba, sempre submersos','areias trazidas pelo vento','lava que arrefeceu ao chegar ao mar','sedimentos dos rios numa laguna'], e:'É a acumulação de fragmentos sempre submersa (D na Fig. 2, p. 246).' },
+    { id:'m2-12', m:2, s:4, t:'mc', q:'Os cabos formam-se em rochas…', o:['mais resistentes à abrasão','mais brandas, que recuam depressa','sempre de areia','apenas vulcânicas'], e:'As rochas mais duras recuam mais devagar e ficam salientes: formam cabos.' },
+    { id:'m2-13', m:2, s:4, t:'mc', destaque:true, q:'A corrente de deriva litoral é…', o:['uma corrente induzida pela aproximação oblíqua das ondas à praia, que transporta areias ao longo da costa','uma corrente de águas profundas e frias que sobe à superfície','o ramo da corrente do Golfo que passa ao largo de Portugal','um vento forte de norte'], e:'A deriva litoral é provocada pelas ondas que chegam de lado (oblíquas) e transporta areias, poluentes e objetos ao longo da costa.' },
+    { id:'m2-14', m:2, s:4, t:'mc', q:'Na costa ocidental portuguesa, a deriva litoral transporta as areias sobretudo…', o:['de norte para sul','de sul para norte','de oeste para este','do mar para os rios'], e:'As ondas chegam de noroeste, por isso a deriva é Norte-Sul: os molhes retêm areia a norte e há menos a sul.' },
+    { id:'m2-15', m:2, s:4, t:'mc', q:'Uma transgressão marinha acontece quando…', o:['o mar avança e submerge áreas continentais','o mar recua e áreas submersas emergem','uma arriba deixa de sofrer abrasão','um rio assoreia a sua foz'], e:'Transgressão = o mar avança (costas de submersão). Regressão = o mar recua.' },
+    { id:'m2-16', m:2, s:1, t:'mc', q:'Uma costa de emersão é uma área do litoral que…', o:['emergiu por efeito do recuo do mar','foi submersa pelo avanço do mar','foi formada por lava','resulta de uma barragem'], e:'Costa de emersão: emergiu quando o mar recuou (ex.: Caminha–Esposende).' },
+    { id:'m2-17', m:2, s:0, t:'mc', q:'Nos Açores e na Madeira predomina…', o:['o litoral de arriba alta, mais irregular','o litoral de praia arenosa','a costa de emersão de granito','as ilhas-barreira'], e:'Nos arquipélagos predomina a arriba alta; as praias são pouco representativas.' },
+    { id:'m2-18', m:2, s:4, t:'mc', q:'As restingas e as ilhas-barreira formam-se por…', o:['acumulação de areias transportadas pelo mar, que assoreiam a foz dos rios e reentrâncias','desgaste das arribas pela abrasão','escoadas de lava que arrefecem no mar','subida de águas profundas'], e:'São formas de acumulação: a deriva deposita areias e forma cordões, atrás dos quais ficam lagunas.' },
+    { id:'m2-19', m:2, s:1, t:'vf', q:'A costa de praia forma-se em relevo baixo e em rochas mais brandas, como arenitos e argilas.', a:true, e:'Verdadeiro (manual, p. 245).' },
+    { id:'m2-20', m:2, s:1, t:'vf', q:'No Continente, a costa de praia ocupa maior extensão do que a costa de arriba.', a:false, e:'Falso: predomina a costa de arriba; a de praia ocupa menor extensão.' },
+    { id:'m2-21', m:2, s:2, t:'vf', q:'A abrasão marinha provoca o recuo das arribas vivas.', a:true, e:'Verdadeiro: desgasta a base, a parte de cima desmorona-se e a arriba recua.' },
+    { id:'m2-22', m:2, s:4, t:'vf', q:'As enseadas e pequenas baías formam-se nas rochas de maior dureza.', a:false, e:'Falso: formam-se nas rochas de menor dureza, que recuam mais depressa.' },
+    { id:'m2-23', m:2, s:0, t:'vf', q:'A linha de costa portuguesa é predominantemente alta e pouco recortada.', a:true, e:'Verdadeiro (manual, p. 244).' },
+    { id:'m2-24', m:2, s:2, t:'vf', q:'O desgaste provocado pelo mar é maior nas formações rochosas mais duras.', a:false, e:'Falso: o desgaste é maior nas formações mais brandas.' },
+    { id:'m2-25', m:2, s:2, t:'completa', q:'A ___ marinha é a erosão reforçada pelo arremesso de areias e fragmentos contra as arribas.', o:['abrasão','regressão','transgressão','deriva'], e:'Abrasão marinha: as ondas atiram areia e fragmentos contra a arriba e desgastam-na como uma lixa.' },
+    { id:'m2-26', m:2, s:2, t:'completa', q:'A arriba que já não sofre abrasão marinha chama-se arriba ___.', o:['morta','viva','baixa','de emersão'], e:'Arriba morta: recuou ou o nível do mar baixou, e o mar já não a desgasta.' },
+    { id:'m2-27', m:2, s:4, t:'completa', q:'A corrente de ___ litoral é induzida pela chegada oblíqua das ondas à praia.', o:['deriva','compensação','Portugal','Canárias'], e:'Deriva litoral: as ondas chegam de lado à praia e empurram as areias ao longo da costa.' },
+    { id:'m2-28', m:2, s:3, t:'mc', q:'Ordena as etapas do recuo de uma arriba viva:\n1. A parte superior desmorona-se.\n2. A abrasão desgasta a base.\n3. Forma-se a plataforma de abrasão.', o:['2 – 1 – 3','1 – 2 – 3','3 – 2 – 1','2 – 3 – 1'], e:'Primeiro a abrasão desgasta a base, depois a parte de cima cai, e os fragmentos formam a plataforma de abrasão.' },
+    { id:'m2-29', m:2, s:3, t:'mc', doc:'arriba', q:'No esquema, o número 2 assinala…', o:['a plataforma de abrasão','a plataforma de acumulação','uma arriba morta','uma restinga'], e:'O 2 é a faixa entre a arriba e o mar, visível na maré baixa: plataforma de abrasão.' },
 
     /* ---------------- Mundo 3: acidentes do litoral e portos ---------------- */
-    { id:'m3-01', m:3, t:'mc', destaque:true, q:'A ria de Aveiro é…', o:['um sistema lagunar separado do mar por uma extensa restinga','uma pequena ilha ligada ao Continente por um istmo','um antigo golfo em forma de concha','uma escoada de lava que avançou sobre o mar'], e:'A ria de Aveiro é um sistema lagunar de água salobra, na foz do Vouga, separado do mar por uma restinga.' },
-    { id:'m3-02', m:3, t:'mc', destaque:true, q:'O tômbolo de Peniche resultou…', o:['da acumulação de areias e seixos que ligou uma pequena ilha ao Continente','do recuo de uma arriba de calcário','de uma erupção vulcânica','da construção de um molhe'], e:'Peniche era uma ilha; a acumulação de areias e seixos formou um istmo que a ligou ao Continente.' },
-    { id:'m3-03', m:3, t:'mc', q:'A concha de São Martinho do Porto é…', o:['um antigo golfo cuja entrada ficou mais apertada pela deposição de areias e seixos','um sistema de ilhas-barreira','uma arriba morta','um estuário da Rede Natura 2000'], e:'Resultou da deposição de areias e seixos na entrada de um antigo golfo: hoje é uma pequena baía em forma de concha.' },
-    { id:'m3-04', m:3, t:'mc', destaque:true, q:'A ria Formosa (ou de Faro) é…', o:['um sistema lagunar de restingas e ilhas-barreira, formado pela acumulação de sedimentos marinhos','uma baía formada em rochas brandas','um estuário de um grande rio','uma fajã detrítica'], e:'É um sistema lagunar de restingas e ilhas-barreira; boas condições para pesca, aquicultura e salicultura.' },
-    { id:'m3-05', m:3, t:'mc', q:'Os estuários do Tejo e do Sado são importantes porque…', o:['são áreas abrigadas e reservas naturais com aves migratórias, com boas condições para portos','têm as maiores arribas do país','são os únicos sítios com upwelling','foram formados por lava'], e:'São reservas da Rede Natura 2000 e áreas abrigadas, com portos como Lisboa e Setúbal.' },
-    { id:'m3-06', m:3, t:'mc', q:'Uma fajã é…', o:['um terreno plano à beira-mar, formado por materiais desprendidos das vertentes (ou por lava)','uma reentrância de rocha branda','uma corrente fria','uma praia de areia branca'], e:'As fajãs são típicas dos arquipélagos; em São Jorge há mais de 70.' },
-    { id:'m3-07', m:3, t:'mc', q:'O delta lávico do Seixal (Madeira) é…', o:['uma escoada de lava que avançou sobre o mar','um cordão de areia branca','um antigo golfo','um tômbolo'], e:'Formou-se por uma escoada de lava que arrefeceu ao chegar ao mar.' },
-    { id:'m3-08', m:3, t:'mc', q:'O vulcão dos Capelinhos…', o:['emergiu do mar em 1957 e acrescentou terra à ilha do Faial','formou a ria de Aveiro','é uma arriba do barlavento algarvio','fica no Porto Santo'], e:'A erupção de 1957 fez crescer a ilha do Faial (Açores).' },
-    { id:'m3-09', m:3, t:'mc', q:'No Porto Santo destaca-se…', o:['uma praia de areia branca com cordão dunar','uma praia de areia escura de basalto','uma ria com ilhas-barreira','um tômbolo'], e:'Ao contrário das outras ilhas, o Porto Santo tem uma praia de areia branca e o seu cordão dunar.' },
-    { id:'m3-10', m:3, t:'mc', destaque:true, q:'A maioria dos portos de mar do Continente localiza-se…', o:['no flanco sul dos cabos, abrigados dos ventos de oeste e noroeste','no flanco norte dos cabos, virados ao vento','sempre em arribas altas','no interior, longe da costa'], e:'Como a costa é pouco recortada e exposta, os portos procuram abrigo a sul dos cabos (e em estuários e lagunas).' },
-    { id:'m3-11', m:3, t:'mc', q:'O porto de Sesimbra é abrigado pelo…', o:['cabo Espichel','cabo Mondego','cabo de São Vicente','cabo Carvoeiro'], e:'Exemplo do manual: «O cabo Espichel abriga o porto de Sesimbra.»' },
-    { id:'m3-12', m:3, t:'mc', q:'O porto de Peniche é abrigado pelo…', o:['cabo Carvoeiro','cabo da Roca','cabo Espichel','cabo de Santa Maria'], e:'O cabo Carvoeiro protege Peniche dos ventos e vagas de noroeste.' },
-    { id:'m3-13', m:3, t:'mc', q:'O porto da Figueira da Foz é abrigado pelo…', o:['cabo Mondego','cabo de Sines','cabo Carvoeiro','cabo da Roca'], e:'O cabo Mondego fica a norte da Figueira da Foz.' },
-    { id:'m3-14', m:3, t:'mc', q:'Porque é que muitos portos precisaram de pontões e molhes?', o:['Porque a costa é pouco recortada e muito exposta a ventos e vagas fortes','Porque a água é demasiado quente','Porque os portos ficam em rios sem mar','Porque a ZEE é pequena'], e:'Há poucos abrigos naturais, por isso constroem-se infraestruturas de proteção.' },
-    { id:'m3-15', m:3, t:'vf', q:'A ria de Aveiro resultou do recuo do mar e da acumulação de sedimentos marinhos e fluviais.', a:true, e:'Verdadeiro (manual, p. 249; também no exercício 3, IV, da p. 254).' },
-    { id:'m3-16', m:3, t:'vf', q:'O tômbolo de Peniche é uma escoada de lava.', a:false, e:'Falso: é um istmo de areias e seixos que liga uma antiga ilha ao Continente.' },
-    { id:'m3-17', m:3, t:'vf', q:'Nos arquipélagos, a costa alta e rochosa é mais recortada do que a do Continente.', a:true, e:'Verdadeiro (manual, p. 248).' },
-    { id:'m3-18', m:3, t:'vf', q:'Os portos do Continente localizam-se sobretudo no flanco norte dos cabos.', a:false, e:'Falso: no flanco sul, protegidos dos ventos de oeste e noroeste.' },
-    { id:'m3-19', m:3, t:'vf', q:'A ria Formosa tem boas condições para a pesca, a aquicultura e a salicultura.', a:true, e:'Verdadeiro (manual, p. 249).' },
-    { id:'m3-20', m:3, t:'completa', q:'Peniche era uma pequena ilha, hoje ligada ao Continente por um ___.', o:['tômbolo','estuário','talude','delta lávico'], e:'Tômbolo (istmo de areias e seixos).' },
-    { id:'m3-21', m:3, t:'completa', q:'A ria de Aveiro está separada do mar por uma extensa ___.', o:['restinga','arriba','fajã','plataforma de abrasão'], e:'Restinga: um cordão de areia preso à terra que separa a laguna (ria) do mar.' },
-    { id:'m3-22', m:3, t:'completa', q:'Os portos procuram o flanco ___ dos cabos.', o:['sul','norte','oeste','interior'], e:'Sul (abrigo dos ventos de oeste e noroeste).' },
-    { id:'m3-23', m:3, t:'mc', q:'Associa: «ria de Aveiro» → qual o processo de formação?', o:['Recuo do mar e acumulação de sedimentos','Erupção vulcânica','Escoada lávica','Erosão das vertentes'], e:'Exercício da p. 249: ria de Aveiro → recuo do mar e acumulação de sedimentos.' },
-    { id:'m3-24', m:3, t:'mc', doc:'acidentes', q:'No mapa, o número 3 assinala…', o:['o tômbolo de Peniche','a ria de Aveiro','o estuário do Sado','a concha de São Martinho do Porto'], e:'O 3 é Peniche, a antiga ilha ligada ao Continente.' },
+    { id:'m3-01', m:3, s:0, t:'mc', destaque:true, q:'A ria de Aveiro é…', o:['um sistema lagunar separado do mar por uma extensa restinga','uma pequena ilha ligada ao Continente por um istmo','um antigo golfo em forma de concha','uma escoada de lava que avançou sobre o mar'], e:'A ria de Aveiro é um sistema lagunar de água salobra, na foz do Vouga, separado do mar por uma restinga.' },
+    { id:'m3-02', m:3, s:0, t:'mc', destaque:true, q:'O tômbolo de Peniche resultou…', o:['da acumulação de areias e seixos que ligou uma pequena ilha ao Continente','do recuo de uma arriba de calcário','de uma erupção vulcânica','da construção de um molhe'], e:'Peniche era uma ilha; a acumulação de areias e seixos formou um istmo que a ligou ao Continente.' },
+    { id:'m3-03', m:3, s:0, t:'mc', q:'A concha de São Martinho do Porto é…', o:['um antigo golfo cuja entrada ficou mais apertada pela deposição de areias e seixos','um sistema de ilhas-barreira','uma arriba morta','um estuário da Rede Natura 2000'], e:'Resultou da deposição de areias e seixos na entrada de um antigo golfo: hoje é uma pequena baía em forma de concha.' },
+    { id:'m3-04', m:3, s:0, t:'mc', destaque:true, q:'A ria Formosa (ou de Faro) é…', o:['um sistema lagunar de restingas e ilhas-barreira, formado pela acumulação de sedimentos marinhos','uma baía formada em rochas brandas','um estuário de um grande rio','uma fajã detrítica'], e:'É um sistema lagunar de restingas e ilhas-barreira; boas condições para pesca, aquicultura e salicultura.' },
+    { id:'m3-05', m:3, s:0, t:'mc', q:'Os estuários do Tejo e do Sado são importantes porque…', o:['são áreas abrigadas e reservas naturais com aves migratórias, com boas condições para portos','têm as maiores arribas do país','são os únicos sítios com upwelling','foram formados por lava'], e:'São reservas da Rede Natura 2000 e áreas abrigadas, com portos como Lisboa e Setúbal.' },
+    { id:'m3-06', m:3, s:1, t:'mc', q:'Uma fajã é…', o:['um terreno plano à beira-mar, formado por materiais desprendidos das vertentes (ou por lava)','uma reentrância de rocha branda','uma corrente fria','uma praia de areia branca'], e:'As fajãs são típicas dos arquipélagos; em São Jorge há mais de 70.' },
+    { id:'m3-07', m:3, s:1, t:'mc', q:'O delta lávico do Seixal (Madeira) é…', o:['uma escoada de lava que avançou sobre o mar','um cordão de areia branca','um antigo golfo','um tômbolo'], e:'Formou-se por uma escoada de lava que arrefeceu ao chegar ao mar.' },
+    { id:'m3-08', m:3, s:1, t:'mc', q:'O vulcão dos Capelinhos…', o:['emergiu do mar em 1957 e acrescentou terra à ilha do Faial','formou a ria de Aveiro','é uma arriba do barlavento algarvio','fica no Porto Santo'], e:'A erupção de 1957 fez crescer a ilha do Faial (Açores).' },
+    { id:'m3-09', m:3, s:1, t:'mc', q:'No Porto Santo destaca-se…', o:['uma praia de areia branca com cordão dunar','uma praia de areia escura de basalto','uma ria com ilhas-barreira','um tômbolo'], e:'Ao contrário das outras ilhas, o Porto Santo tem uma praia de areia branca e o seu cordão dunar.' },
+    { id:'m3-10', m:3, s:2, t:'mc', destaque:true, q:'A maioria dos portos de mar do Continente localiza-se…', o:['no flanco sul dos cabos, abrigados dos ventos de oeste e noroeste','no flanco norte dos cabos, virados ao vento','sempre em arribas altas','no interior, longe da costa'], e:'Como a costa é pouco recortada e exposta, os portos procuram abrigo a sul dos cabos (e em estuários e lagunas).' },
+    { id:'m3-11', m:3, s:2, t:'mc', q:'O porto de Sesimbra é abrigado pelo…', o:['cabo Espichel','cabo Mondego','cabo de São Vicente','cabo Carvoeiro'], e:'Exemplo do manual: «O cabo Espichel abriga o porto de Sesimbra.»' },
+    { id:'m3-12', m:3, s:2, t:'mc', q:'O porto de Peniche é abrigado pelo…', o:['cabo Carvoeiro','cabo da Roca','cabo Espichel','cabo de Santa Maria'], e:'O cabo Carvoeiro protege Peniche dos ventos e vagas de noroeste.' },
+    { id:'m3-13', m:3, s:2, t:'mc', q:'O porto da Figueira da Foz é abrigado pelo…', o:['cabo Mondego','cabo de Sines','cabo Carvoeiro','cabo da Roca'], e:'O cabo Mondego fica a norte da Figueira da Foz.' },
+    { id:'m3-14', m:3, s:2, t:'mc', q:'Porque é que muitos portos precisaram de pontões e molhes?', o:['Porque a costa é pouco recortada e muito exposta a ventos e vagas fortes','Porque a água é demasiado quente','Porque os portos ficam em rios sem mar','Porque a ZEE é pequena'], e:'Há poucos abrigos naturais, por isso constroem-se infraestruturas de proteção.' },
+    { id:'m3-15', m:3, s:0, t:'vf', q:'A ria de Aveiro resultou do recuo do mar e da acumulação de sedimentos marinhos e fluviais.', a:true, e:'Verdadeiro (manual, p. 249; também no exercício 3, IV, da p. 254).' },
+    { id:'m3-16', m:3, s:0, t:'vf', q:'O tômbolo de Peniche é uma escoada de lava.', a:false, e:'Falso: é um istmo de areias e seixos que liga uma antiga ilha ao Continente.' },
+    { id:'m3-17', m:3, s:1, t:'vf', q:'Nos arquipélagos, a costa alta e rochosa é mais recortada do que a do Continente.', a:true, e:'Verdadeiro (manual, p. 248).' },
+    { id:'m3-18', m:3, s:2, t:'vf', q:'Os portos do Continente localizam-se sobretudo no flanco norte dos cabos.', a:false, e:'Falso: no flanco sul, protegidos dos ventos de oeste e noroeste.' },
+    { id:'m3-19', m:3, s:0, t:'vf', q:'A ria Formosa tem boas condições para a pesca, a aquicultura e a salicultura.', a:true, e:'Verdadeiro (manual, p. 249).' },
+    { id:'m3-20', m:3, s:0, t:'completa', q:'Peniche era uma pequena ilha, hoje ligada ao Continente por um ___.', o:['tômbolo','estuário','talude','delta lávico'], e:'Tômbolo (istmo de areias e seixos).' },
+    { id:'m3-21', m:3, s:0, t:'completa', q:'A ria de Aveiro está separada do mar por uma extensa ___.', o:['restinga','arriba','fajã','plataforma de abrasão'], e:'Restinga: um cordão de areia preso à terra que separa a laguna (ria) do mar.' },
+    { id:'m3-22', m:3, s:2, t:'completa', q:'Os portos procuram o flanco ___ dos cabos.', o:['sul','norte','oeste','interior'], e:'Sul (abrigo dos ventos de oeste e noroeste).' },
+    { id:'m3-23', m:3, s:0, t:'mc', q:'Associa: «ria de Aveiro» → qual o processo de formação?', o:['Recuo do mar e acumulação de sedimentos','Erupção vulcânica','Escoada lávica','Erosão das vertentes'], e:'Exercício da p. 249: ria de Aveiro → recuo do mar e acumulação de sedimentos.' },
+    { id:'m3-24', m:3, s:0, t:'mc', doc:'acidentes', q:'No mapa, o número 3 assinala…', o:['o tômbolo de Peniche','a ria de Aveiro','o estuário do Sado','a concha de São Martinho do Porto'], e:'O 3 é Peniche, a antiga ilha ligada ao Continente.' },
 
     /* ---------------- Mundo 4: fatores da abundância de pescado ---------------- */
-    { id:'m4-01', m:4, t:'mc', destaque:true, q:'O plâncton é…', o:['o conjunto de organismos microscópicos, vegetais (fitoplâncton) ou animais (zooplâncton), base da cadeia alimentar marinha','um tipo de rede de pesca','uma corrente marítima fria','um sedimento do fundo do mar'], e:'O plâncton é a base da cadeia alimentar marinha.' },
-    { id:'m4-02', m:4, t:'mc', destaque:true, q:'As plataformas continentais são ricas em pescado porque…', o:['têm pouca profundidade (mais luz), águas agitadas (mais oxigénio) e recebem água doce dos rios (nutrientes)','são muito profundas e escuras','têm águas paradas e salgadas','ficam longe da costa'], e:'Luz, oxigénio e nutrientes favorecem o plâncton e, por isso, o peixe.' },
-    { id:'m4-03', m:4, t:'mc', q:'Em Portugal continental, a plataforma continental…', o:['é estreita (30 a 70 km), mais larga ao largo do cabo da Roca','é muito larga, como no noroeste da Europa','não existe','é mais larga no Algarve'], e:'É estreita, com 30 a 70 km, e atinge a maior extensão ao largo do cabo da Roca.' },
-    { id:'m4-04', m:4, t:'mc', q:'Nos Açores e na Madeira, a plataforma continental é quase inexistente porque…', o:['as ilhas são de origem vulcânica (topos de uma cordilheira submarina)','a água é muito quente','há muita poluição','os rios são muito grandes'], e:'A origem vulcânica faz com que o fundo desça muito depressa junto às ilhas.' },
-    { id:'m4-05', m:4, t:'mc', destaque:true, q:'A plataforma continental estreita é, para a pesca em Portugal, um fator…', o:['desfavorável, porque reduz a zona de abundância de pescado','muito favorável, porque se atingem grandes profundidades','indiferente','favorável, porque há menos peixe para competir'], e:'É desfavorável: temos uma pequena zona de abundância de pescado.' },
-    { id:'m4-06', m:4, t:'mc', q:'Uma corrente marítima é…', o:['a deslocação de grandes massas de água com idênticas características de temperatura e densidade','um vento forte junto à costa','a subida da maré','o movimento das areias numa praia'], e:'Definição do manual (p. 252).' },
-    { id:'m4-07', m:4, t:'mc', q:'As correntes frias são mais favoráveis ao pescado porque…', o:['têm origem na subida das águas e arrastam matéria do fundo, sendo ricas em nutrientes','são mais salgadas','têm menos oxigénio','trazem lava'], e:'As correntes frias trazem nutrientes do fundo.' },
-    { id:'m4-08', m:4, t:'mc', destaque:true, q:'Segundo o manual, a Corrente de Portugal…', o:['é um ramo da Deriva do Atlântico Norte, quente e pobre em nutrientes','é uma corrente fria do Ártico','é provocada pela nortada','só existe nos Açores'], e:'O manual (pp. 252–253) diz que é uma corrente quente e superficial, pobre em nutrientes: fator desfavorável.' },
-    { id:'m4-09', m:4, t:'mc', q:'A sudoeste do território, a Corrente de Portugal junta-se…', o:['à corrente fria das Canárias, o que é favorável à pesca','à corrente do Golfo, o que é desfavorável','à corrente do Labrador','à deriva litoral'], e:'A confluência com a corrente fria das Canárias aumenta a agitação, a oxigenação e os nutrientes.' },
-    { id:'m4-10', m:4, t:'mc', destaque:true, q:'A nortada é…', o:['um vento forte de norte que sopra no litoral, sobretudo no verão','uma corrente de águas profundas','um vento quente de sul no inverno','a corrente que transporta areias para norte'], e:'A nortada é o vento forte de norte, típico do verão na costa ocidental.' },
-    { id:'m4-11', m:4, t:'mc', q:'A situação meteorológica que dá origem à nortada, no verão, é…', o:['o anticiclone dos Açores a norte/oeste e uma depressão térmica no interior da Península Ibérica','uma depressão sobre os Açores e um anticiclone na Península','a passagem de uma superfície frontal fria','a corrente quente de Portugal'], e:'O ar vai das altas pressões (anticiclone dos Açores) para as baixas pressões (depressão térmica ibérica) e sopra de norte na costa. Atenção: isto não está nas páginas do manual que vimos.' },
-    { id:'m4-12', m:4, t:'mc', destaque:true, q:'O upwelling (afloramento costeiro) é…', o:['uma corrente de águas profundas e frias, carregadas de nutrientes, que sobe à superfície','uma corrente quente vinda do Golfo do México','o recuo das arribas','a acumulação de areias na foz de um rio'], e:'Definição do manual (p. 253).' },
-    { id:'m4-13', m:4, t:'mc', destaque:true, q:'O upwelling acontece na costa portuguesa porque…', o:['a nortada afasta as águas superficiais para o largo e as águas profundas sobem para as substituir','as ondas chegam oblíquas à praia','a plataforma continental é muito larga','os rios trazem água doce'], e:'A nortada empurra a água de cima para o largo; sobe uma corrente de compensação de águas profundas.' },
-    { id:'m4-14', m:4, t:'mc', q:'O upwelling é, para a pesca, um fator…', o:['muito favorável: aumenta o volume e a qualidade do pescado','desfavorável: arrefece demasiado a água','indiferente','desfavorável: afasta os peixes'], e:'Muito favorável: por exemplo, a sardinha fica mais gorda e saborosa no verão.' },
-    { id:'m4-15', m:4, t:'mc', q:'No verão, a temperatura da água junto à costa ocidental é mais baixa do que ao largo por causa…', o:['do upwelling provocado pela nortada','da corrente quente de Portugal','do degelo dos rios','da plataforma continental estreita'], e:'As águas frias do fundo sobem junto à costa.' },
-    { id:'m4-16', m:4, t:'mc', q:'Do litoral para o largo, a sequência do relevo do fundo é…', o:['plataforma continental, talude continental, planície abissal','talude continental, plataforma continental, planície abissal','planície abissal, talude, plataforma','plataforma, planície abissal, talude'], e:'Plataforma (até 200 m) → talude (descida forte) → planície abissal.' },
-    { id:'m4-17', m:4, t:'mc', q:'Os canhões submarinos são…', o:['vales profundos que cortam os taludes continentais','correntes frias','ilhas vulcânicas','cordões de areia'], e:'Os taludes portugueses são sulcados por canhões submarinos (ex.: Nazaré).' },
-    { id:'m4-18', m:4, t:'mc', q:'Analisa as afirmações:\nI. No litoral continental predomina a costa rochosa e de arriba alta, pouco recortada e com fracas condições de abrigo para os portos.\nII. Ao largo da costa passa a corrente quente de Portugal, com origem na Deriva do Atlântico Norte, que se junta à corrente fria das Canárias.\nIII. A plataforma continental portuguesa é estreita, o que é favorável à pesca.\nIV. A ria de Aveiro formou-se pelo recuo do mar e pela acumulação de sedimentos marinhos.\nV. O upwelling, no verão, é um fator favorável à pesca.\nSeleciona a opção que reúne as afirmações corretas.', o:['I, II, IV e V','I, II, III e V','II, III e IV','I, II e V'], e:'Exercício 3 da p. 254: a III é falsa (a plataforma estreita é desfavorável). Resposta C do manual.' },
-    { id:'m4-19', m:4, t:'vf', q:'Cerca de 80% das capturas mundiais fazem-se nas plataformas continentais.', a:true, e:'Verdadeiro (manual, p. 252).' },
-    { id:'m4-20', m:4, t:'vf', q:'As correntes quentes são muito favoráveis à formação de plâncton.', a:false, e:'Falso: as correntes quentes são pouco favoráveis.' },
-    { id:'m4-21', m:4, t:'vf', q:'Na confluência de uma corrente fria com uma quente há maior agitação e oxigenação das águas.', a:true, e:'Verdadeiro: por isso forma-se mais plâncton.' },
-    { id:'m4-22', m:4, t:'vf', q:'O upwelling ocorre sobretudo no inverno.', a:false, e:'Falso: ocorre no verão, com a nortada.' },
-    { id:'m4-23', m:4, t:'vf', q:'A água doce dos rios traz nutrientes minerais e orgânicos para a plataforma continental.', a:true, e:'Verdadeiro: também reduz o teor de sal.' },
-    { id:'m4-24', m:4, t:'completa', q:'A ___ é o vento forte de norte que provoca o upwelling no verão.', o:['nortada','deriva litoral','corrente das Canárias','brisa marítima'], e:'Nortada: vento forte de norte, no verão, que afasta a água superficial para o largo.' },
-    { id:'m4-25', m:4, t:'completa', q:'O ___ é a base da cadeia alimentar marinha.', o:['plâncton','talude','sal','cardume'], e:'Plâncton: organismos microscópicos (fitoplâncton e zooplâncton) de que dependem os peixes.' },
-    { id:'m4-26', m:4, t:'mc', doc:'upwelling', q:'O esquema representa…', o:['o upwelling: a nortada afasta a água superficial e sobem águas profundas frias','a deriva litoral a transportar areias','o recuo de uma arriba','a formação de um tômbolo'], e:'É o esquema do upwelling (p. 253 e exercício 5 da p. 254).' },
+    { id:'m4-01', m:4, s:0, t:'mc', destaque:true, q:'O plâncton é…', o:['o conjunto de organismos microscópicos, vegetais (fitoplâncton) ou animais (zooplâncton), base da cadeia alimentar marinha','um tipo de rede de pesca','uma corrente marítima fria','um sedimento do fundo do mar'], e:'O plâncton é a base da cadeia alimentar marinha.' },
+    { id:'m4-02', m:4, s:1, t:'mc', destaque:true, q:'As plataformas continentais são ricas em pescado porque…', o:['têm pouca profundidade (mais luz), águas agitadas (mais oxigénio) e recebem água doce dos rios (nutrientes)','são muito profundas e escuras','têm águas paradas e salgadas','ficam longe da costa'], e:'Luz, oxigénio e nutrientes favorecem o plâncton e, por isso, o peixe.' },
+    { id:'m4-03', m:4, s:1, t:'mc', q:'Em Portugal continental, a plataforma continental…', o:['é estreita (30 a 70 km), mais larga ao largo do cabo da Roca','é muito larga, como no noroeste da Europa','não existe','é mais larga no Algarve'], e:'É estreita, com 30 a 70 km, e atinge a maior extensão ao largo do cabo da Roca.' },
+    { id:'m4-04', m:4, s:1, t:'mc', q:'Nos Açores e na Madeira, a plataforma continental é quase inexistente porque…', o:['as ilhas são de origem vulcânica (topos de uma cordilheira submarina)','a água é muito quente','há muita poluição','os rios são muito grandes'], e:'A origem vulcânica faz com que o fundo desça muito depressa junto às ilhas.' },
+    { id:'m4-05', m:4, s:1, t:'mc', destaque:true, q:'A plataforma continental estreita é, para a pesca em Portugal, um fator…', o:['desfavorável, porque reduz a zona de abundância de pescado','muito favorável, porque se atingem grandes profundidades','indiferente','favorável, porque há menos peixe para competir'], e:'É desfavorável: temos uma pequena zona de abundância de pescado.' },
+    { id:'m4-06', m:4, s:2, t:'mc', q:'Uma corrente marítima é…', o:['a deslocação de grandes massas de água com idênticas características de temperatura e densidade','um vento forte junto à costa','a subida da maré','o movimento das areias numa praia'], e:'Definição do manual (p. 252).' },
+    { id:'m4-07', m:4, s:2, t:'mc', q:'As correntes frias são mais favoráveis ao pescado porque…', o:['têm origem na subida das águas e arrastam matéria do fundo, sendo ricas em nutrientes','são mais salgadas','têm menos oxigénio','trazem lava'], e:'As correntes frias trazem nutrientes do fundo.' },
+    { id:'m4-08', m:4, s:2, t:'mc', destaque:true, q:'Segundo o manual, a Corrente de Portugal…', o:['é um ramo da Deriva do Atlântico Norte, quente e pobre em nutrientes','é uma corrente fria do Ártico','é provocada pela nortada','só existe nos Açores'], e:'O manual (pp. 252–253) diz que é uma corrente quente e superficial, pobre em nutrientes: fator desfavorável.' },
+    { id:'m4-09', m:4, s:2, t:'mc', q:'A sudoeste do território, a Corrente de Portugal junta-se…', o:['à corrente fria das Canárias, o que é favorável à pesca','à corrente do Golfo, o que é desfavorável','à corrente do Labrador','à deriva litoral'], e:'A confluência com a corrente fria das Canárias aumenta a agitação, a oxigenação e os nutrientes.' },
+    { id:'m4-10', m:4, s:3, t:'mc', destaque:true, q:'A nortada é…', o:['um vento forte de norte que sopra no litoral, sobretudo no verão','uma corrente de águas profundas','um vento quente de sul no inverno','a corrente que transporta areias para norte'], e:'A nortada é o vento forte de norte, típico do verão na costa ocidental.' },
+    { id:'m4-11', m:4, s:3, t:'mc', q:'A situação meteorológica que dá origem à nortada, no verão, é…', o:['o anticiclone dos Açores a norte/oeste e uma depressão térmica no interior da Península Ibérica','uma depressão sobre os Açores e um anticiclone na Península','a passagem de uma superfície frontal fria','a corrente quente de Portugal'], e:'O ar vai das altas pressões (anticiclone dos Açores) para as baixas pressões (depressão térmica ibérica) e sopra de norte na costa. Atenção: isto não está nas páginas do manual que vimos.' },
+    { id:'m4-12', m:4, s:3, t:'mc', destaque:true, q:'O upwelling (afloramento costeiro) é…', o:['uma corrente de águas profundas e frias, carregadas de nutrientes, que sobe à superfície','uma corrente quente vinda do Golfo do México','o recuo das arribas','a acumulação de areias na foz de um rio'], e:'Definição do manual (p. 253).' },
+    { id:'m4-13', m:4, s:3, t:'mc', destaque:true, q:'O upwelling acontece na costa portuguesa porque…', o:['a nortada afasta as águas superficiais para o largo e as águas profundas sobem para as substituir','as ondas chegam oblíquas à praia','a plataforma continental é muito larga','os rios trazem água doce'], e:'A nortada empurra a água de cima para o largo; sobe uma corrente de compensação de águas profundas.' },
+    { id:'m4-14', m:4, s:3, t:'mc', q:'O upwelling é, para a pesca, um fator…', o:['muito favorável: aumenta o volume e a qualidade do pescado','desfavorável: arrefece demasiado a água','indiferente','desfavorável: afasta os peixes'], e:'Muito favorável: por exemplo, a sardinha fica mais gorda e saborosa no verão.' },
+    { id:'m4-15', m:4, s:3, t:'mc', q:'No verão, a temperatura da água junto à costa ocidental é mais baixa do que ao largo por causa…', o:['do upwelling provocado pela nortada','da corrente quente de Portugal','do degelo dos rios','da plataforma continental estreita'], e:'As águas frias do fundo sobem junto à costa.' },
+    { id:'m4-16', m:4, s:1, t:'mc', q:'Do litoral para o largo, a sequência do relevo do fundo é…', o:['plataforma continental, talude continental, planície abissal','talude continental, plataforma continental, planície abissal','planície abissal, talude, plataforma','plataforma, planície abissal, talude'], e:'Plataforma (até 200 m) → talude (descida forte) → planície abissal.' },
+    { id:'m4-17', m:4, s:1, t:'mc', q:'Os canhões submarinos são…', o:['vales profundos que cortam os taludes continentais','correntes frias','ilhas vulcânicas','cordões de areia'], e:'Os taludes portugueses são sulcados por canhões submarinos (ex.: Nazaré).' },
+    { id:'m4-18', m:4, s:3, t:'mc', q:'Analisa as afirmações:\nI. No litoral continental predomina a costa rochosa e de arriba alta, pouco recortada e com fracas condições de abrigo para os portos.\nII. Ao largo da costa passa a corrente quente de Portugal, com origem na Deriva do Atlântico Norte, que se junta à corrente fria das Canárias.\nIII. A plataforma continental portuguesa é estreita, o que é favorável à pesca.\nIV. A ria de Aveiro formou-se pelo recuo do mar e pela acumulação de sedimentos marinhos.\nV. O upwelling, no verão, é um fator favorável à pesca.\nSeleciona a opção que reúne as afirmações corretas.', o:['I, II, IV e V','I, II, III e V','II, III e IV','I, II e V'], e:'Exercício 3 da p. 254: a III é falsa (a plataforma estreita é desfavorável). Resposta C do manual.' },
+    { id:'m4-19', m:4, s:1, t:'vf', q:'Cerca de 80% das capturas mundiais fazem-se nas plataformas continentais.', a:true, e:'Verdadeiro (manual, p. 252).' },
+    { id:'m4-20', m:4, s:2, t:'vf', q:'As correntes quentes são muito favoráveis à formação de plâncton.', a:false, e:'Falso: as correntes quentes são pouco favoráveis.' },
+    { id:'m4-21', m:4, s:2, t:'vf', q:'Na confluência de uma corrente fria com uma quente há maior agitação e oxigenação das águas.', a:true, e:'Verdadeiro: por isso forma-se mais plâncton.' },
+    { id:'m4-22', m:4, s:3, t:'vf', q:'O upwelling ocorre sobretudo no inverno.', a:false, e:'Falso: ocorre no verão, com a nortada.' },
+    { id:'m4-23', m:4, s:1, t:'vf', q:'A água doce dos rios traz nutrientes minerais e orgânicos para a plataforma continental.', a:true, e:'Verdadeiro: também reduz o teor de sal.' },
+    { id:'m4-24', m:4, s:3, t:'completa', q:'A ___ é o vento forte de norte que provoca o upwelling no verão.', o:['nortada','deriva litoral','corrente das Canárias','brisa marítima'], e:'Nortada: vento forte de norte, no verão, que afasta a água superficial para o largo.' },
+    { id:'m4-25', m:4, s:0, t:'completa', q:'O ___ é a base da cadeia alimentar marinha.', o:['plâncton','talude','sal','cardume'], e:'Plâncton: organismos microscópicos (fitoplâncton e zooplâncton) de que dependem os peixes.' },
+    { id:'m4-26', m:4, s:3, t:'mc', doc:'upwelling', q:'O esquema representa…', o:['o upwelling: a nortada afasta a água superficial e sobem águas profundas frias','a deriva litoral a transportar areias','o recuo de uma arriba','a formação de um tômbolo'], e:'É o esquema do upwelling (p. 253 e exercício 5 da p. 254).' },
 
     /* ---------------- Mundo 5: o setor das pescas ---------------- */
-    { id:'m5-01', m:5, t:'mc', destaque:true, q:'A pesca local caracteriza-se por…', o:['pequenas embarcações (menos de 9 m), artes artesanais e águas interiores ou perto da costa','navios de 100 GT ou mais em águas internacionais','embarcações de 9 a 33 m além das 6 milhas','apoio de navios-fábrica'], e:'Pesca local: barcos pequenos, artes artesanais (anzol, armadilhas, pequenas redes), curtos períodos.' },
-    { id:'m5-02', m:5, t:'mc', destaque:true, q:'A pesca costeira…', o:['opera além das 6 milhas, com embarcações de 9 a 33 m e meios modernos de deteção e captura','opera só em rios e lagoas','usa navios-fábrica durante meses','usa só artes artesanais'], e:'Pesca costeira: além das 6 mn, horas ou dias de navegação, barcos de 9 a 33 m.' },
-    { id:'m5-03', m:5, t:'mc', destaque:true, q:'A pesca do largo…', o:['opera para lá das 12 milhas, em águas internacionais e ZEE estrangeiras, com navios de 100 GT ou mais','opera só em águas interiores','usa barcos com menos de 9 m','dura apenas algumas horas'], e:'Pesca do largo: navios grandes, autonomia de pelo menos 15 dias, apoio de navio-congelador ou navio-fábrica.' },
-    { id:'m5-04', m:5, t:'mc', q:'Associa cada tipo de pesca às características:\nA – a. local; b. costeira; c. do largo.\nB – 1. Opera além das 6 milhas, a horas ou dias do porto. 2. Opera para lá das 12 milhas, com autonomia de 15 dias. 3. Embarcações de 9 a 33 m com meios de conservação. 4. Apoio de navio-congelador ou navio-fábrica. 5. Captura espécies de maior valor com artes específicas.', o:['(a: 5); (b: 1 e 3); (c: 2 e 4)','(a: 1 e 3); (b: 5); (c: 2 e 4)','(a: 4); (b: 1 e 3); (c: 2 e 5)','(a: 2 e 4); (b: 1 e 3); (c: 5)'], e:'Exercício 2 da p. 270: resposta A.' },
-    { id:'m5-05', m:5, t:'mc', destaque:true, q:'Segundo o manual (dados de 2019), a espécie com maior volume de capturas foi…', o:['a cavala','a sardinha','o polvo','o bacalhau'], e:'Em 2019: 1.º cavala, 2.º carapau, 3.º atuns, 4.º sardinha, 5.º biqueirão. (Em 2024, segundo o INE, a sardinha voltou ao 1.º lugar.)' },
-    { id:'m5-06', m:5, t:'mc', destaque:true, q:'Segundo o manual, as espécies que geram maior valor são…', o:['os polvos, seguidos dos atuns','a cavala e o carapau','a sardinha e o biqueirão','o bacalhau e a pescada'], e:'Em valor lideram os polvos, sobretudo pela forma de captura com armadilhas, e depois os atuns.' },
-    { id:'m5-07', m:5, t:'mc', q:'O polvo tem um valor tão alto porque…', o:['é capturado com armadilhas (alcatruzes), técnica especializada que exige mais mão de obra, em capturas pouco volumosas','é pescado em grandes quantidades com arrasto','vem todo da aquicultura intensiva','é importado'], e:'O polvo pesca-se com armadilhas (alcatruzes): técnica especializada, muita mão de obra e pouca quantidade, por isso o preço é alto (p. 259).' },
-    { id:'m5-08', m:5, t:'mc', q:'Em 2019, a sardinha aparecia apenas em 4.º lugar em volume porque…', o:['os stocks diminuíram e há restrições à sua captura (quotas desde 2018)','deixou de haver procura','passou a ser criada em aquicultura','só se pesca nos Açores'], e:'A redução dos stocks e as restrições à captura fizeram a sardinha perder os primeiros lugares.' },
-    { id:'m5-09', m:5, t:'mc', q:'As quotas de pesca são…', o:['limites às capturas de uma espécie','impostos sobre o peixe vendido','licenças para construir portos','apoios para comprar barcos'], e:'Quotas = limites às capturas (ex.: sardinha desde 2018, bacalhau desde 2021).' },
-    { id:'m5-10', m:5, t:'mc', destaque:true, q:'No âmbito da Política Comum das Pescas, Portugal…', o:['pode pescar nas ZEE comunitárias e em pesqueiros externos, cumprindo os acordos com países terceiros','só pode pescar no mar territorial','não pode pescar fora da sua ZEE','deixou de ter quotas'], e:'A PCP abre as águas comunitárias e permite acordos com países terceiros.' },
-    { id:'m5-11', m:5, t:'mc', destaque:true, q:'Os acordos de pesca com outros países são importantes porque…', o:['diversificam as áreas de pesca e compensam os recursos limitados da ZEE portuguesa','permitem pescar sem regras','acabam com as quotas','aumentam a plataforma continental'], e:'A costa regular e a plataforma estreita limitam a pesca; os acordos dão acesso a outros pesqueiros.' },
-    { id:'m5-12', m:5, t:'mc', q:'A frota portuguesa opera sobretudo…', o:['no Atlântico Nordeste (áreas do ICES e da CECAF)','no Pacífico','no Mar Mediterrâneo','no Oceano Índico'], e:'Manual, p. 257. Também pesca no Atlântico Noroeste (NAFO), por exemplo cantarilho e bacalhau.' },
-    { id:'m5-13', m:5, t:'mc', q:'O FEAMP é…', o:['o Fundo Europeu dos Assuntos Marítimos e das Pescas, que financia a PCP','o plano de ordenamento do espaço marítimo','a convenção sobre o direito do mar','o organismo que forma pescadores'], e:'O FEAMP apoia a modernização, a sustentabilidade e os pequenos pescadores.' },
-    { id:'m5-14', m:5, t:'mc', destaque:true, q:'A frota de pesca portuguesa caracteriza-se por…', o:['predominarem as embarcações de pequena dimensão e de pesca local','predominarem os navios-fábrica','ter cada vez mais embarcações','não ter embarcações com motor'], e:'Cerca de 90% têm menos de 5 GT; predominam as de pesca local.' },
-    { id:'m5-15', m:5, t:'mc', q:'A arqueação bruta (GT) mede…', o:['o volume interno total do navio','a velocidade do navio','o número de pescadores a bordo','a quantidade de peixe capturada'], e:'Arqueação bruta: volume interno total do casco e dos espaços; 1 GT = 2,832 m³.' },
-    { id:'m5-16', m:5, t:'mc', destaque:true, q:'A população ativa na pesca caracteriza-se por…', o:['estar mais envelhecida e ter menos escolaridade do que a média nacional','ser muito jovem e com curso superior','estar a aumentar muito','estar concentrada no Alentejo'], e:'Isso reduz a capacidade de inovar, de arriscar e de aderir aos programas de apoio.' },
-    { id:'m5-17', m:5, t:'mc', q:'O Norte e o Centro têm mais pescadores matriculados porque…', o:['têm mais portos e embarcações','têm a plataforma continental mais larga do mundo','não têm quotas','têm aquicultura intensiva'], e:'O Norte e o Centro têm mais portos e embarcações, por isso também mais pescadores matriculados (p. 262).' },
-    { id:'m5-18', m:5, t:'mc', q:'A lota é…', o:['o local onde se faz o leilão e a primeira venda do pescado','um tipo de rede de pesca','a zona onde se cria peixe','um navio-fábrica'], e:'A rede de lotas tem sistemas eletrónicos que tornam a venda mais rápida e transparente.' },
-    { id:'m5-19', m:5, t:'mc', q:'Nos portos de pesca, a conservação do pescado é garantida por…', o:['venda de gelo e entreposto frigorífico','armazém de apresto','posto de combustíveis','serviços administrativos'], e:'Gelo e entreposto frigorífico conservam o peixe.' },
-    { id:'m5-20', m:5, t:'mc', q:'A regulamentação e fiscalização da descarga do pescado servem para garantir…', o:['a segurança alimentar, o cumprimento das quotas e dos tamanhos mínimos de desembarque','preços mais altos para os compradores','que só se vende peixe de aquicultura','o aumento do número de barcos'], e:'A fiscalização na descarga garante a segurança alimentar e o cumprimento das quotas e dos tamanhos mínimos (p. 264).' },
-    { id:'m5-21', m:5, t:'mc', q:'Muitas embarcações de pesca têm sido reconvertidas para…', o:['atividades de turismo (mergulho, observação de espécies, passeios)','transporte de mercadorias','navios-fábrica','barcos de guerra'], e:'Muitas embarcações passaram a fazer mergulho, observação de espécies marinhas e passeios (p. 261).' },
-    { id:'m5-22', m:5, t:'mc', q:'Analisa as afirmações:\nI. A contribuição do setor da pesca para a economia nacional tem aumentado.\nII. No âmbito da PCP, Portugal pode capturar em pesqueiros externos, cumprindo normas dos acordos com países terceiros.\nIII. A pesca local tende a pescar espécies de maior valor, sobretudo com armadilhas.\nIV. Tem-se verificado a reconversão de embarcações de pesca para o turismo.\nV. A aquicultura tem tradição em Portugal, sendo o Algarve a região de maior produção, em regime extensivo.\nSeleciona a opção correta.', o:['II, III, IV e V','I, II, IV e V','I, III e IV','II, III e V'], e:'Exercício 1 da p. 270: a I é falsa (a contribuição tem decrescido). Resposta B.' },
-    { id:'m5-23', m:5, t:'mc', q:'O ranking correto das espécies com maior volume de capturas (manual, 2019) é…', o:['1.º cavala, 2.º carapau, 3.º atuns, 4.º sardinha, 5.º biqueirão','1.º polvos, 2.º atuns, 3.º carapau-negrão, 4.º sardinha, 5.º cavala','1.º sardinha, 2.º cavala, 3.º carapau, 4.º atuns, 5.º polvo','1.º bacalhau, 2.º sardinha, 3.º polvo, 4.º atuns, 5.º cavala'], e:'Exercício 3 da p. 270: opção A.' },
-    { id:'m5-24', m:5, t:'vf', q:'A pesca local opera por curtos períodos ou apenas sazonalmente.', a:true, e:'Verdadeiro: a pesca local faz-se por curtos períodos ou só em certas épocas do ano.' },
-    { id:'m5-25', m:5, t:'vf', q:'A pesca do largo tem quase sempre o apoio de um navio-congelador e/ou de um navio-fábrica.', a:true, e:'Verdadeiro: o navio-congelador ou navio-fábrica conserva e transforma o pescado no mar.' },
-    { id:'m5-26', m:5, t:'vf', q:'O valor das capturas tem tendência para diminuir.', a:false, e:'Falso: o valor tende a aumentar (sobe o preço das espécies protegidas e capturam-se espécies de maior valor).' },
-    { id:'m5-27', m:5, t:'vf', q:'A frota nacional tem vindo a diminuir, para se adequar aos recursos disponíveis.', a:true, e:'Verdadeiro: os stocks são vulneráveis.' },
-    { id:'m5-28', m:5, t:'vf', q:'Os pescadores portugueses têm, em média, mais escolaridade do que a população em geral.', a:false, e:'Falso: têm níveis de escolaridade inferiores à média nacional.' },
-    { id:'m5-29', m:5, t:'vf', q:'A pesca costeira opera com embarcações de 9 a 33 metros.', a:true, e:'Verdadeiro: a pesca costeira usa barcos de 9 a 33 m, com meios modernos de deteção e captura.' },
-    { id:'m5-30', m:5, t:'vf', q:'A sardinha é capturada sobretudo com a arte do arrasto.', a:false, e:'Falso: 98% da sardinha é capturada com o cerco (Doc. «Luta desigual», p. 271).' },
-    { id:'m5-31', m:5, t:'completa', q:'A pesca ___ opera para lá das 12 milhas, em águas internacionais e ZEE estrangeiras.', o:['do largo','local','costeira','artesanal'], e:'Pesca do largo: navios de 100 GT ou mais, longe da costa, durante semanas ou meses.' },
-    { id:'m5-32', m:5, t:'completa', q:'A ___ é o local onde se faz o leilão e a primeira venda do pescado.', o:['lota','salina','doca seca','fajã'], e:'Lota: é aí que se faz o leilão (primeira venda) do pescado, com sistemas eletrónicos.' },
-    { id:'m5-33', m:5, t:'completa', q:'Em valor, a espécie que lidera é o ___.', o:['polvo','carapau','biqueirão','cantarilho'], e:'Polvo: lidera em valor, por causa da captura com alcatruzes, que exige muita mão de obra (p. 259).' },
-    { id:'m5-34', m:5, t:'mc', doc:'especies2019', q:'Segundo o documento, a espécie com maior volume de capturas em 2019 foi…', o:['a cavala','o carapau','a sardinha','o biqueirão'], e:'Cavala: 46 314 t, muito à frente do carapau (17 168 t).' },
-    { id:'m5-35', m:5, t:'mc', doc:'especies2019', q:'Segundo o documento, em que lugar ficou a sardinha em volume?', o:['4.º','1.º','2.º','5.º'], e:'4.º, atrás da cavala, do carapau e dos atuns.' },
-    { id:'m5-36', m:5, t:'mc', doc:'especies2024', q:'Comparando este documento (2024) com os dados do manual (2019), conclui-se que…', o:['a sardinha passou a ser a espécie mais capturada','a cavala continuou em 1.º lugar','o polvo passou a ser o mais capturado','deixou de se pescar carapau'], e:'Em 2024 a sardinha teve 31,4% das capturas de peixes marinhos, à frente da cavala (18,0%).' },
-    { id:'m5-37', m:5, t:'mc', doc:'artes2024', q:'Segundo o documento, a arte de pesca responsável pela maior parte das capturas é…', o:['o cerco','o arrasto','a polivalente','o palangre'], e:'O cerco, com 51,7% das capturas (sardinha, cavala, carapau).' },
-    { id:'m5-38', m:5, t:'mc', doc:'frota2019', q:'O documento mostra que…', o:['a grande maioria das embarcações tem menos de 5 GT','a maioria tem mais de 100 GT','há tantas embarcações grandes como pequenas','não há embarcações pequenas'], e:'6517 embarcações têm menos de 5 GT: predominam os barcos pequenos.' },
-    { id:'m5-39', m:5, t:'mc', doc:'idades2019', q:'Segundo o documento, o grupo etário predominante entre os ativos da pesca é…', o:['35 a 54 anos','16 a 34 anos','55 anos e mais','menos de 16 anos'], e:'56,6% têm 35 a 54 anos. Atenção: há ligeiramente mais pessoas com 55 anos e mais (21,9%) do que com 16 a 34 anos (21,5%).' },
-    { id:'m5-40', m:5, t:'mc', doc:'pescadores', q:'O texto refere que a população ativa na pesca…', o:['tem diminuído, tem baixa qualificação e idade avançada, o que dificulta a modernização','tem aumentado e rejuvenescido','é muito qualificada','não influencia a inovação do setor'], e:'Menos ativos, mais velhos e menos qualificados: o setor inova e moderniza-se mais devagar.' },
+    { id:'m5-01', m:5, s:2, t:'mc', destaque:true, q:'A pesca local caracteriza-se por…', o:['pequenas embarcações (menos de 9 m), artes artesanais e águas interiores ou perto da costa','navios de 100 GT ou mais em águas internacionais','embarcações de 9 a 33 m além das 6 milhas','apoio de navios-fábrica'], e:'Pesca local: barcos pequenos, artes artesanais (anzol, armadilhas, pequenas redes), curtos períodos.' },
+    { id:'m5-02', m:5, s:2, t:'mc', destaque:true, q:'A pesca costeira…', o:['opera além das 6 milhas, com embarcações de 9 a 33 m e meios modernos de deteção e captura','opera só em rios e lagoas','usa navios-fábrica durante meses','usa só artes artesanais'], e:'Pesca costeira: além das 6 mn, horas ou dias de navegação, barcos de 9 a 33 m.' },
+    { id:'m5-03', m:5, s:2, t:'mc', destaque:true, q:'A pesca do largo…', o:['opera para lá das 12 milhas, em águas internacionais e ZEE estrangeiras, com navios de 100 GT ou mais','opera só em águas interiores','usa barcos com menos de 9 m','dura apenas algumas horas'], e:'Pesca do largo: navios grandes, autonomia de pelo menos 15 dias, apoio de navio-congelador ou navio-fábrica.' },
+    { id:'m5-04', m:5, s:2, t:'mc', q:'Associa cada tipo de pesca às características:\nA – a. local; b. costeira; c. do largo.\nB – 1. Opera além das 6 milhas, a horas ou dias do porto. 2. Opera para lá das 12 milhas, com autonomia de 15 dias. 3. Embarcações de 9 a 33 m com meios de conservação. 4. Apoio de navio-congelador ou navio-fábrica. 5. Captura espécies de maior valor com artes específicas.', o:['(a: 5); (b: 1 e 3); (c: 2 e 4)','(a: 1 e 3); (b: 5); (c: 2 e 4)','(a: 4); (b: 1 e 3); (c: 2 e 5)','(a: 2 e 4); (b: 1 e 3); (c: 5)'], e:'Exercício 2 da p. 270: resposta A.' },
+    { id:'m5-05', m:5, s:1, t:'mc', destaque:true, q:'Segundo o manual (dados de 2019), a espécie com maior volume de capturas foi…', o:['a cavala','a sardinha','o polvo','o bacalhau'], e:'Em 2019: 1.º cavala, 2.º carapau, 3.º atuns, 4.º sardinha, 5.º biqueirão. (Em 2024, segundo o INE, a sardinha voltou ao 1.º lugar.)' },
+    { id:'m5-06', m:5, s:1, t:'mc', destaque:true, q:'Segundo o manual, as espécies que geram maior valor são…', o:['os polvos, seguidos dos atuns','a cavala e o carapau','a sardinha e o biqueirão','o bacalhau e a pescada'], e:'Em valor lideram os polvos, sobretudo pela forma de captura com armadilhas, e depois os atuns.' },
+    { id:'m5-07', m:5, s:1, t:'mc', q:'O polvo tem um valor tão alto porque…', o:['é capturado com armadilhas (alcatruzes), técnica especializada que exige mais mão de obra, em capturas pouco volumosas','é pescado em grandes quantidades com arrasto','vem todo da aquicultura intensiva','é importado'], e:'O polvo pesca-se com armadilhas (alcatruzes): técnica especializada, muita mão de obra e pouca quantidade, por isso o preço é alto (p. 259).' },
+    { id:'m5-08', m:5, s:1, t:'mc', q:'Em 2019, a sardinha aparecia apenas em 4.º lugar em volume porque…', o:['os stocks diminuíram e há restrições à sua captura (quotas desde 2018)','deixou de haver procura','passou a ser criada em aquicultura','só se pesca nos Açores'], e:'A redução dos stocks e as restrições à captura fizeram a sardinha perder os primeiros lugares.' },
+    { id:'m5-09', m:5, s:1, t:'mc', q:'As quotas de pesca são…', o:['limites às capturas de uma espécie','impostos sobre o peixe vendido','licenças para construir portos','apoios para comprar barcos'], e:'Quotas = limites às capturas (ex.: sardinha desde 2018, bacalhau desde 2021).' },
+    { id:'m5-10', m:5, s:0, t:'mc', destaque:true, q:'No âmbito da Política Comum das Pescas, Portugal…', o:['pode pescar nas ZEE comunitárias e em pesqueiros externos, cumprindo os acordos com países terceiros','só pode pescar no mar territorial','não pode pescar fora da sua ZEE','deixou de ter quotas'], e:'A PCP abre as águas comunitárias e permite acordos com países terceiros.' },
+    { id:'m5-11', m:5, s:0, t:'mc', destaque:true, q:'Os acordos de pesca com outros países são importantes porque…', o:['diversificam as áreas de pesca e compensam os recursos limitados da ZEE portuguesa','permitem pescar sem regras','acabam com as quotas','aumentam a plataforma continental'], e:'A costa regular e a plataforma estreita limitam a pesca; os acordos dão acesso a outros pesqueiros.' },
+    { id:'m5-12', m:5, s:0, t:'mc', q:'A frota portuguesa opera sobretudo…', o:['no Atlântico Nordeste (áreas do ICES e da CECAF)','no Pacífico','no Mar Mediterrâneo','no Oceano Índico'], e:'Manual, p. 257. Também pesca no Atlântico Noroeste (NAFO), por exemplo cantarilho e bacalhau.' },
+    { id:'m5-13', m:5, s:0, t:'mc', q:'O FEAMP é…', o:['o Fundo Europeu dos Assuntos Marítimos e das Pescas, que financia a PCP','o plano de ordenamento do espaço marítimo','a convenção sobre o direito do mar','o organismo que forma pescadores'], e:'O FEAMP apoia a modernização, a sustentabilidade e os pequenos pescadores.' },
+    { id:'m5-14', m:5, s:3, t:'mc', destaque:true, q:'A frota de pesca portuguesa caracteriza-se por…', o:['predominarem as embarcações de pequena dimensão e de pesca local','predominarem os navios-fábrica','ter cada vez mais embarcações','não ter embarcações com motor'], e:'Cerca de 90% têm menos de 5 GT; predominam as de pesca local.' },
+    { id:'m5-15', m:5, s:3, t:'mc', q:'A arqueação bruta (GT) mede…', o:['o volume interno total do navio','a velocidade do navio','o número de pescadores a bordo','a quantidade de peixe capturada'], e:'Arqueação bruta: volume interno total do casco e dos espaços; 1 GT = 2,832 m³.' },
+    { id:'m5-16', m:5, s:3, t:'mc', destaque:true, q:'A população ativa na pesca caracteriza-se por…', o:['estar mais envelhecida e ter menos escolaridade do que a média nacional','ser muito jovem e com curso superior','estar a aumentar muito','estar concentrada no Alentejo'], e:'Isso reduz a capacidade de inovar, de arriscar e de aderir aos programas de apoio.' },
+    { id:'m5-17', m:5, s:3, t:'mc', q:'O Norte e o Centro têm mais pescadores matriculados porque…', o:['têm mais portos e embarcações','têm a plataforma continental mais larga do mundo','não têm quotas','têm aquicultura intensiva'], e:'O Norte e o Centro têm mais portos e embarcações, por isso também mais pescadores matriculados (p. 262).' },
+    { id:'m5-18', m:5, s:4, t:'mc', q:'A lota é…', o:['o local onde se faz o leilão e a primeira venda do pescado','um tipo de rede de pesca','a zona onde se cria peixe','um navio-fábrica'], e:'A rede de lotas tem sistemas eletrónicos que tornam a venda mais rápida e transparente.' },
+    { id:'m5-19', m:5, s:4, t:'mc', q:'Nos portos de pesca, a conservação do pescado é garantida por…', o:['venda de gelo e entreposto frigorífico','armazém de apresto','posto de combustíveis','serviços administrativos'], e:'Gelo e entreposto frigorífico conservam o peixe.' },
+    { id:'m5-20', m:5, s:4, t:'mc', q:'A regulamentação e fiscalização da descarga do pescado servem para garantir…', o:['a segurança alimentar, o cumprimento das quotas e dos tamanhos mínimos de desembarque','preços mais altos para os compradores','que só se vende peixe de aquicultura','o aumento do número de barcos'], e:'A fiscalização na descarga garante a segurança alimentar e o cumprimento das quotas e dos tamanhos mínimos (p. 264).' },
+    { id:'m5-21', m:5, s:3, t:'mc', q:'Muitas embarcações de pesca têm sido reconvertidas para…', o:['atividades de turismo (mergulho, observação de espécies, passeios)','transporte de mercadorias','navios-fábrica','barcos de guerra'], e:'Muitas embarcações passaram a fazer mergulho, observação de espécies marinhas e passeios (p. 261).' },
+    { id:'m5-22', m:5, s:4, t:'mc', q:'Analisa as afirmações:\nI. A contribuição do setor da pesca para a economia nacional tem aumentado.\nII. No âmbito da PCP, Portugal pode capturar em pesqueiros externos, cumprindo normas dos acordos com países terceiros.\nIII. A pesca local tende a pescar espécies de maior valor, sobretudo com armadilhas.\nIV. Tem-se verificado a reconversão de embarcações de pesca para o turismo.\nV. A aquicultura tem tradição em Portugal, sendo o Algarve a região de maior produção, em regime extensivo.\nSeleciona a opção correta.', o:['II, III, IV e V','I, II, IV e V','I, III e IV','II, III e V'], e:'Exercício 1 da p. 270: a I é falsa (a contribuição tem decrescido). Resposta B.' },
+    { id:'m5-23', m:5, s:1, t:'mc', q:'O ranking correto das espécies com maior volume de capturas (manual, 2019) é…', o:['1.º cavala, 2.º carapau, 3.º atuns, 4.º sardinha, 5.º biqueirão','1.º polvos, 2.º atuns, 3.º carapau-negrão, 4.º sardinha, 5.º cavala','1.º sardinha, 2.º cavala, 3.º carapau, 4.º atuns, 5.º polvo','1.º bacalhau, 2.º sardinha, 3.º polvo, 4.º atuns, 5.º cavala'], e:'Exercício 3 da p. 270: opção A.' },
+    { id:'m5-24', m:5, s:2, t:'vf', q:'A pesca local opera por curtos períodos ou apenas sazonalmente.', a:true, e:'Verdadeiro: a pesca local faz-se por curtos períodos ou só em certas épocas do ano.' },
+    { id:'m5-25', m:5, s:2, t:'vf', q:'A pesca do largo tem quase sempre o apoio de um navio-congelador e/ou de um navio-fábrica.', a:true, e:'Verdadeiro: o navio-congelador ou navio-fábrica conserva e transforma o pescado no mar.' },
+    { id:'m5-26', m:5, s:1, t:'vf', q:'O valor das capturas tem tendência para diminuir.', a:false, e:'Falso: o valor tende a aumentar (sobe o preço das espécies protegidas e capturam-se espécies de maior valor).' },
+    { id:'m5-27', m:5, s:3, t:'vf', q:'A frota nacional tem vindo a diminuir, para se adequar aos recursos disponíveis.', a:true, e:'Verdadeiro: os stocks são vulneráveis.' },
+    { id:'m5-28', m:5, s:3, t:'vf', q:'Os pescadores portugueses têm, em média, mais escolaridade do que a população em geral.', a:false, e:'Falso: têm níveis de escolaridade inferiores à média nacional.' },
+    { id:'m5-29', m:5, s:2, t:'vf', q:'A pesca costeira opera com embarcações de 9 a 33 metros.', a:true, e:'Verdadeiro: a pesca costeira usa barcos de 9 a 33 m, com meios modernos de deteção e captura.' },
+    { id:'m5-30', m:5, s:2, t:'vf', q:'A sardinha é capturada sobretudo com a arte do arrasto.', a:false, e:'Falso: 98% da sardinha é capturada com o cerco (Doc. «Luta desigual», p. 271).' },
+    { id:'m5-31', m:5, s:2, t:'completa', q:'A pesca ___ opera para lá das 12 milhas, em águas internacionais e ZEE estrangeiras.', o:['do largo','local','costeira','artesanal'], e:'Pesca do largo: navios de 100 GT ou mais, longe da costa, durante semanas ou meses.' },
+    { id:'m5-32', m:5, s:4, t:'completa', q:'A ___ é o local onde se faz o leilão e a primeira venda do pescado.', o:['lota','salina','doca seca','fajã'], e:'Lota: é aí que se faz o leilão (primeira venda) do pescado, com sistemas eletrónicos.' },
+    { id:'m5-33', m:5, s:1, t:'completa', q:'Em valor, a espécie que lidera é o ___.', o:['polvo','carapau','biqueirão','cantarilho'], e:'Polvo: lidera em valor, por causa da captura com alcatruzes, que exige muita mão de obra (p. 259).' },
+    { id:'m5-34', m:5, s:1, t:'mc', doc:'especies2019', q:'Segundo o documento, a espécie com maior volume de capturas em 2019 foi…', o:['a cavala','o carapau','a sardinha','o biqueirão'], e:'Cavala: 46 314 t, muito à frente do carapau (17 168 t).' },
+    { id:'m5-35', m:5, s:1, t:'mc', doc:'especies2019', q:'Segundo o documento, em que lugar ficou a sardinha em volume?', o:['4.º','1.º','2.º','5.º'], e:'4.º, atrás da cavala, do carapau e dos atuns.' },
+    { id:'m5-36', m:5, s:1, t:'mc', doc:'especies2024', q:'Comparando este documento (2024) com os dados do manual (2019), conclui-se que…', o:['a sardinha passou a ser a espécie mais capturada','a cavala continuou em 1.º lugar','o polvo passou a ser o mais capturado','deixou de se pescar carapau'], e:'Em 2024 a sardinha teve 31,4% das capturas de peixes marinhos, à frente da cavala (18,0%).' },
+    { id:'m5-37', m:5, s:2, t:'mc', doc:'artes2024', q:'Segundo o documento, a arte de pesca responsável pela maior parte das capturas é…', o:['o cerco','o arrasto','a polivalente','o palangre'], e:'O cerco, com 51,7% das capturas (sardinha, cavala, carapau).' },
+    { id:'m5-38', m:5, s:3, t:'mc', doc:'frota2019', q:'O documento mostra que…', o:['a grande maioria das embarcações tem menos de 5 GT','a maioria tem mais de 100 GT','há tantas embarcações grandes como pequenas','não há embarcações pequenas'], e:'6517 embarcações têm menos de 5 GT: predominam os barcos pequenos.' },
+    { id:'m5-39', m:5, s:3, t:'mc', doc:'idades2019', q:'Segundo o documento, o grupo etário predominante entre os ativos da pesca é…', o:['35 a 54 anos','16 a 34 anos','55 anos e mais','menos de 16 anos'], e:'56,6% têm 35 a 54 anos. Atenção: há ligeiramente mais pessoas com 55 anos e mais (21,9%) do que com 16 a 34 anos (21,5%).' },
+    { id:'m5-40', m:5, s:3, t:'mc', doc:'pescadores', q:'O texto refere que a população ativa na pesca…', o:['tem diminuído, tem baixa qualificação e idade avançada, o que dificulta a modernização','tem aumentado e rejuvenescido','é muito qualificada','não influencia a inovação do setor'], e:'Menos ativos, mais velhos e menos qualificados: o setor inova e moderniza-se mais devagar.' },
 
     /* ---------------- Mundo 6: aquicultura, indústria, salicultura e sustentabilidade ---------------- */
-    { id:'m6-01', m:6, t:'mc', destaque:true, q:'A aquicultura é…', o:['a criação de organismos aquáticos com processos que aumentam a produção do meio natural','a produção de sal por evaporação','a pesca com armadilhas','a transformação do peixe em conservas'], e:'Definição do manual (p. 266).' },
-    { id:'m6-02', m:6, t:'mc', destaque:true, q:'Uma vantagem da aquicultura é…', o:['reduzir a pressão sobre os recursos marinhos, favorecendo a sua recuperação','aumentar a pesca de juvenis','acabar com as lotas','dispensar regras ambientais'], e:'É uma forma alternativa de obter pescado e permite repovoar habitats.' },
-    { id:'m6-03', m:6, t:'mc', q:'As áreas com melhores condições para a aquicultura em Portugal são…', o:['as rias de Aveiro e de Faro','as arribas da Costa Vicentina','o alto mar dos Açores','as serras do interior'], e:'Água salobra, movimento de marés e muitos nutrientes.' },
-    { id:'m6-04', m:6, t:'mc', destaque:true, q:'No regime extensivo de aquicultura…', o:['a alimentação é exclusivamente natural e o impacte ambiental é pequeno','a alimentação é exclusivamente artificial','há controlo total das condições','usam-se só peixes como pregado e robalo'], e:'Extensivo: práticas tradicionais, alimento natural, pouco impacte (moluscos, Algarve).' },
-    { id:'m6-05', m:6, t:'mc', q:'No regime intensivo de aquicultura…', o:['há controlo total e a alimentação é exclusivamente artificial, com forte impacte ambiental','a alimentação é só natural','não há qualquer interferência humana','produzem-se sobretudo amêijoas'], e:'Intensivo: ração artificial, resíduos, sobretudo peixes (pregado, dourada, robalo), na Madeira e no Centro.' },
-    { id:'m6-06', m:6, t:'mc', q:'No regime semi-intensivo, as espécies…', o:['consomem alimento natural e também suplementos artificiais','só comem ração','só comem alimento natural','não são alimentadas'], e:'Semi-intensivo = natural + suplementos.' },
-    { id:'m6-07', m:6, t:'mc', q:'Em Portugal, na aquicultura, predomina…', o:['o regime extensivo, com produção de moluscos (amêijoas e ostras), sobretudo no Algarve','o regime intensivo de salmão','a aquicultura de água doce','a produção de algas'], e:'Manual, p. 267: predomina o extensivo, embora o intensivo tenda a aumentar.' },
-    { id:'m6-08', m:6, t:'mc', q:'Um problema ambiental da aquicultura é…', o:['a poluição por efluentes não tratados e a fuga de espécies invasoras','o aumento dos stocks selvagens','a redução da poluição','a criação de praias'], e:'Na aquicultura, os efluentes não tratados poluem as águas e as espécies que fogem podem ser invasoras (p. 276).' },
-    { id:'m6-09', m:6, t:'mc', destaque:true, q:'O subsetor da indústria transformadora com maior produção é o dos…', o:['congelados','preparados e conservas','secos e salgados','fumados'], e:'Os congelados são o subsetor mais recente e já estão em 1.º lugar (mais de 50%).' },
-    { id:'m6-10', m:6, t:'mc', destaque:true, q:'O subsetor dos preparados e conservas destaca-se por…', o:['ser o único com saldo comercial positivo (exporta mais do que importa)','ser o que mais produz','trabalhar quase só bacalhau','ser o mais recente'], e:'Produz menos, mas é o 2.º em valor e o único com saldo positivo (atum e sardinha).' },
-    { id:'m6-11', m:6, t:'mc', q:'A salga e secagem é quase totalmente de…', o:['bacalhau','sardinha','polvo','atum'], e:'Portugal é o maior consumidor mundial de bacalhau.' },
-    { id:'m6-12', m:6, t:'mc', q:'A indústria transformadora do pescado tem maior implantação…', o:['no Norte e no Centro','no Alentejo','na Madeira','nos Açores'], e:'A indústria transformadora do pescado está sobretudo no Norte e no Centro, onde gera emprego e riqueza (p. 268).' },
-    { id:'m6-13', m:6, t:'mc', destaque:true, q:'A salicultura é…', o:['a produção de sal marinho por evaporação solar, em salinas','a criação de peixe em água salgada','a extração de sal-gema em minas','a dessalinização da água do mar'], e:'Sal marinho por evaporação da água do mar ao sol.' },
-    { id:'m6-14', m:6, t:'mc', q:'A principal região produtora de sal marinho é o Algarve, por causa…', o:['da exposição a sul e das temperaturas mais altas','das arribas altas','da nortada','da plataforma continental larga'], e:'O calor e o sol aceleram a evaporação.' },
-    { id:'m6-15', m:6, t:'mc', q:'A flor de sal é…', o:['cristais leves que flutuam, recolhidos à mão; o sal mais requintado','o sal produzido com meios mecânicos, mais barato','sal-gema das minas','sal com iodo acrescentado'], e:'Flor de sal: recolhida manualmente, o sal mais requintado e saudável (segundo o manual).' },
-    { id:'m6-16', m:6, t:'mc', q:'O sal marinho comum (97% da produção)…', o:['vem de salinas modernas com meios mecânicos e é o mais barato','é recolhido à mão em salinas tradicionais','são cristais que flutuam','é importado'], e:'O sal marinho comum vem de salinas modernas com meios mecânicos e é o mais barato (p. 269).' },
-    { id:'m6-17', m:6, t:'mc', q:'A salicultura tem perdido salinas sobretudo por…', o:['falta de mão de obra','falta de sol','excesso de chuva no Algarve','proibição da UE'], e:'É uma atividade tradicional com pouca mão de obra disponível.' },
-    { id:'m6-18', m:6, t:'mc', destaque:true, q:'A época de defeso é…', o:['um período em que é proibido capturar uma espécie, para ela se reproduzir','a época em que se pesca mais','o período de férias dos pescadores','o tempo de leilão na lota'], e:'Na sardinha, o defeso é entre dezembro e abril, conforme a zona da costa.' },
-    { id:'m6-19', m:6, t:'mc', q:'O tamanho mínimo de desembarque serve para…', o:['proteger os peixes jovens (juvenis), que ainda não se reproduziram','aumentar o preço do peixe grande','facilitar o transporte','contar os barcos'], e:'Na sardinha, o tamanho mínimo é 11 cm.' },
-    { id:'m6-20', m:6, t:'mc', destaque:true, q:'Qual destas é uma medida de gestão sustentável dos recursos piscícolas?', o:['Respeitar as quotas e as épocas de defeso','Aumentar a pesca de juvenis','Usar redes com malha cada vez mais pequena','Pescar todos os dias da semana sem limite'], e:'Quotas, defeso, tamanhos mínimos, malhagens e limites às capturas acessórias são medidas sustentáveis.' },
-    { id:'m6-21', m:6, t:'mc', doc:'sardinha', q:'Segundo o documento, a gestão da pesca da sardinha…', o:['é feita por Portugal e Espanha, com limites à captura anual, ao esforço de pesca e uma época de defeso','é feita só por Portugal, sem limites','só limita o tamanho dos barcos','proíbe a pesca da sardinha todo o ano'], e:'Plano de Gestão conjunto, máximo de 180 dias de pesca, sem pesca ao fim de semana, defeso e tamanho mínimo de 11 cm.' },
-    { id:'m6-22', m:6, t:'mc', doc:'sardinha', q:'O título «Luta desigual» refere-se, provavelmente, ao facto de…', o:['os cardumes de sardinha enfrentarem uma pesca muito eficaz (cerco e deteção de cardumes)','os pescadores portugueses terem menos barcos do que os espanhóis','a sardinha ser mais pequena do que a cavala','o defeso durar todo o ano'], e:'O cerco captura 98% da sardinha; com tecnologias de deteção, os cardumes ficam em desvantagem: por isso são precisas regras.' },
-    { id:'m6-23', m:6, t:'vf', q:'A aquicultura em Portugal faz-se sobretudo em água doce.', a:false, e:'Falso: faz-se sobretudo em água salobra ou marinha (95%).' },
-    { id:'m6-24', m:6, t:'vf', q:'O número de estabelecimentos de aquicultura diminuiu, mas a produção cresceu.', a:true, e:'Verdadeiro (manual, p. 266).' },
-    { id:'m6-25', m:6, t:'vf', q:'O regime intensivo tem pouco impacte ambiental.', a:false, e:'Falso: tem forte impacte, por causa dos resíduos da ração artificial.' },
-    { id:'m6-26', m:6, t:'vf', q:'Os congelados são o subsetor mais recente da indústria transformadora do pescado.', a:true, e:'Verdadeiro, e já é o 1.º em produção.' },
-    { id:'m6-27', m:6, t:'vf', q:'Em 2019, só havia salinas ativas no Centro e no Algarve.', a:true, e:'Verdadeiro (manual, p. 269).' },
-    { id:'m6-28', m:6, t:'vf', q:'As quotas de pesca da sardinha existem desde 2018.', a:true, e:'Verdadeiro (manual, p. 259).' },
-    { id:'m6-29', m:6, t:'completa', q:'No regime ___ de aquicultura, a alimentação é exclusivamente natural.', o:['extensivo','intensivo','semi-intensivo','industrial'], e:'Extensivo: o alimento é só o natural, com pouco impacte no ambiente.' },
-    { id:'m6-30', m:6, t:'completa', q:'A ___ é a produção de sal marinho por evaporação solar.', o:['salicultura','aquicultura','piscicultura','dessalinização'], e:'Salicultura: o sol evapora a água do mar nas salinas e fica o sal.' },
-    { id:'m6-31', m:6, t:'completa', q:'O período em que é proibido pescar uma espécie para ela se reproduzir chama-se ___.', o:['defeso','quota','lota','arqueação'], e:'Defeso: proibição temporária de pescar uma espécie, na época de reprodução.' },
+    { id:'m6-01', m:6, s:0, t:'mc', destaque:true, q:'A aquicultura é…', o:['a criação de organismos aquáticos com processos que aumentam a produção do meio natural','a produção de sal por evaporação','a pesca com armadilhas','a transformação do peixe em conservas'], e:'Definição do manual (p. 266).' },
+    { id:'m6-02', m:6, s:0, t:'mc', destaque:true, q:'Uma vantagem da aquicultura é…', o:['reduzir a pressão sobre os recursos marinhos, favorecendo a sua recuperação','aumentar a pesca de juvenis','acabar com as lotas','dispensar regras ambientais'], e:'É uma forma alternativa de obter pescado e permite repovoar habitats.' },
+    { id:'m6-03', m:6, s:0, t:'mc', q:'As áreas com melhores condições para a aquicultura em Portugal são…', o:['as rias de Aveiro e de Faro','as arribas da Costa Vicentina','o alto mar dos Açores','as serras do interior'], e:'Água salobra, movimento de marés e muitos nutrientes.' },
+    { id:'m6-04', m:6, s:0, t:'mc', destaque:true, q:'No regime extensivo de aquicultura…', o:['a alimentação é exclusivamente natural e o impacte ambiental é pequeno','a alimentação é exclusivamente artificial','há controlo total das condições','usam-se só peixes como pregado e robalo'], e:'Extensivo: práticas tradicionais, alimento natural, pouco impacte (moluscos, Algarve).' },
+    { id:'m6-05', m:6, s:0, t:'mc', q:'No regime intensivo de aquicultura…', o:['há controlo total e a alimentação é exclusivamente artificial, com forte impacte ambiental','a alimentação é só natural','não há qualquer interferência humana','produzem-se sobretudo amêijoas'], e:'Intensivo: ração artificial, resíduos, sobretudo peixes (pregado, dourada, robalo), na Madeira e no Centro.' },
+    { id:'m6-06', m:6, s:0, t:'mc', q:'No regime semi-intensivo, as espécies…', o:['consomem alimento natural e também suplementos artificiais','só comem ração','só comem alimento natural','não são alimentadas'], e:'Semi-intensivo = natural + suplementos.' },
+    { id:'m6-07', m:6, s:0, t:'mc', q:'Em Portugal, na aquicultura, predomina…', o:['o regime extensivo, com produção de moluscos (amêijoas e ostras), sobretudo no Algarve','o regime intensivo de salmão','a aquicultura de água doce','a produção de algas'], e:'Manual, p. 267: predomina o extensivo, embora o intensivo tenda a aumentar.' },
+    { id:'m6-08', m:6, s:0, t:'mc', q:'Um problema ambiental da aquicultura é…', o:['a poluição por efluentes não tratados e a fuga de espécies invasoras','o aumento dos stocks selvagens','a redução da poluição','a criação de praias'], e:'Na aquicultura, os efluentes não tratados poluem as águas e as espécies que fogem podem ser invasoras (p. 276).' },
+    { id:'m6-09', m:6, s:1, t:'mc', destaque:true, q:'O subsetor da indústria transformadora com maior produção é o dos…', o:['congelados','preparados e conservas','secos e salgados','fumados'], e:'Os congelados são o subsetor mais recente e já estão em 1.º lugar (mais de 50%).' },
+    { id:'m6-10', m:6, s:1, t:'mc', destaque:true, q:'O subsetor dos preparados e conservas destaca-se por…', o:['ser o único com saldo comercial positivo (exporta mais do que importa)','ser o que mais produz','trabalhar quase só bacalhau','ser o mais recente'], e:'Produz menos, mas é o 2.º em valor e o único com saldo positivo (atum e sardinha).' },
+    { id:'m6-11', m:6, s:1, t:'mc', q:'A salga e secagem é quase totalmente de…', o:['bacalhau','sardinha','polvo','atum'], e:'Portugal é o maior consumidor mundial de bacalhau.' },
+    { id:'m6-12', m:6, s:1, t:'mc', q:'A indústria transformadora do pescado tem maior implantação…', o:['no Norte e no Centro','no Alentejo','na Madeira','nos Açores'], e:'A indústria transformadora do pescado está sobretudo no Norte e no Centro, onde gera emprego e riqueza (p. 268).' },
+    { id:'m6-13', m:6, s:2, t:'mc', destaque:true, q:'A salicultura é…', o:['a produção de sal marinho por evaporação solar, em salinas','a criação de peixe em água salgada','a extração de sal-gema em minas','a dessalinização da água do mar'], e:'Sal marinho por evaporação da água do mar ao sol.' },
+    { id:'m6-14', m:6, s:2, t:'mc', q:'A principal região produtora de sal marinho é o Algarve, por causa…', o:['da exposição a sul e das temperaturas mais altas','das arribas altas','da nortada','da plataforma continental larga'], e:'O calor e o sol aceleram a evaporação.' },
+    { id:'m6-15', m:6, s:2, t:'mc', q:'A flor de sal é…', o:['cristais leves que flutuam, recolhidos à mão; o sal mais requintado','o sal produzido com meios mecânicos, mais barato','sal-gema das minas','sal com iodo acrescentado'], e:'Flor de sal: recolhida manualmente, o sal mais requintado e saudável (segundo o manual).' },
+    { id:'m6-16', m:6, s:2, t:'mc', q:'O sal marinho comum (97% da produção)…', o:['vem de salinas modernas com meios mecânicos e é o mais barato','é recolhido à mão em salinas tradicionais','são cristais que flutuam','é importado'], e:'O sal marinho comum vem de salinas modernas com meios mecânicos e é o mais barato (p. 269).' },
+    { id:'m6-17', m:6, s:2, t:'mc', q:'A salicultura tem perdido salinas sobretudo por…', o:['falta de mão de obra','falta de sol','excesso de chuva no Algarve','proibição da UE'], e:'É uma atividade tradicional com pouca mão de obra disponível.' },
+    { id:'m6-18', m:6, s:3, t:'mc', destaque:true, q:'A época de defeso é…', o:['um período em que é proibido capturar uma espécie, para ela se reproduzir','a época em que se pesca mais','o período de férias dos pescadores','o tempo de leilão na lota'], e:'Na sardinha, o defeso é entre dezembro e abril, conforme a zona da costa.' },
+    { id:'m6-19', m:6, s:3, t:'mc', q:'O tamanho mínimo de desembarque serve para…', o:['proteger os peixes jovens (juvenis), que ainda não se reproduziram','aumentar o preço do peixe grande','facilitar o transporte','contar os barcos'], e:'Na sardinha, o tamanho mínimo é 11 cm.' },
+    { id:'m6-20', m:6, s:3, t:'mc', destaque:true, q:'Qual destas é uma medida de gestão sustentável dos recursos piscícolas?', o:['Respeitar as quotas e as épocas de defeso','Aumentar a pesca de juvenis','Usar redes com malha cada vez mais pequena','Pescar todos os dias da semana sem limite'], e:'Quotas, defeso, tamanhos mínimos, malhagens e limites às capturas acessórias são medidas sustentáveis.' },
+    { id:'m6-21', m:6, s:3, t:'mc', doc:'sardinha', q:'Segundo o documento, a gestão da pesca da sardinha…', o:['é feita por Portugal e Espanha, com limites à captura anual, ao esforço de pesca e uma época de defeso','é feita só por Portugal, sem limites','só limita o tamanho dos barcos','proíbe a pesca da sardinha todo o ano'], e:'Plano de Gestão conjunto, máximo de 180 dias de pesca, sem pesca ao fim de semana, defeso e tamanho mínimo de 11 cm.' },
+    { id:'m6-22', m:6, s:3, t:'mc', doc:'sardinha', q:'O título «Luta desigual» refere-se, provavelmente, ao facto de…', o:['os cardumes de sardinha enfrentarem uma pesca muito eficaz (cerco e deteção de cardumes)','os pescadores portugueses terem menos barcos do que os espanhóis','a sardinha ser mais pequena do que a cavala','o defeso durar todo o ano'], e:'O cerco captura 98% da sardinha; com tecnologias de deteção, os cardumes ficam em desvantagem: por isso são precisas regras.' },
+    { id:'m6-23', m:6, s:0, t:'vf', q:'A aquicultura em Portugal faz-se sobretudo em água doce.', a:false, e:'Falso: faz-se sobretudo em água salobra ou marinha (95%).' },
+    { id:'m6-24', m:6, s:0, t:'vf', q:'O número de estabelecimentos de aquicultura diminuiu, mas a produção cresceu.', a:true, e:'Verdadeiro (manual, p. 266).' },
+    { id:'m6-25', m:6, s:0, t:'vf', q:'O regime intensivo tem pouco impacte ambiental.', a:false, e:'Falso: tem forte impacte, por causa dos resíduos da ração artificial.' },
+    { id:'m6-26', m:6, s:1, t:'vf', q:'Os congelados são o subsetor mais recente da indústria transformadora do pescado.', a:true, e:'Verdadeiro, e já é o 1.º em produção.' },
+    { id:'m6-27', m:6, s:2, t:'vf', q:'Em 2019, só havia salinas ativas no Centro e no Algarve.', a:true, e:'Verdadeiro (manual, p. 269).' },
+    { id:'m6-28', m:6, s:3, t:'vf', q:'As quotas de pesca da sardinha existem desde 2018.', a:true, e:'Verdadeiro (manual, p. 259).' },
+    { id:'m6-29', m:6, s:0, t:'completa', q:'No regime ___ de aquicultura, a alimentação é exclusivamente natural.', o:['extensivo','intensivo','semi-intensivo','industrial'], e:'Extensivo: o alimento é só o natural, com pouco impacte no ambiente.' },
+    { id:'m6-30', m:6, s:2, t:'completa', q:'A ___ é a produção de sal marinho por evaporação solar.', o:['salicultura','aquicultura','piscicultura','dessalinização'], e:'Salicultura: o sol evapora a água do mar nas salinas e fica o sal.' },
+    { id:'m6-31', m:6, s:3, t:'completa', q:'O período em que é proibido pescar uma espécie para ela se reproduzir chama-se ___.', o:['defeso','quota','lota','arqueação'], e:'Defeso: proibição temporária de pescar uma espécie, na época de reprodução.' },
 
     /* ---------------- Mundo 7: gestão do litoral e Economia Azul ---------------- */
-    { id:'m7-01', m:7, t:'mc', destaque:true, q:'As obras de proteção da costa, como molhes e esporões, provocam…', o:['acumulação de areias a norte e maior erosão a sul','acumulação de areias a sul e erosão a norte','o fim da deriva litoral','o aumento das praias em toda a costa'], e:'Retêm as areias trazidas pela deriva litoral (de norte para sul): ganha-se areia a norte e perde-se a sul.' },
-    { id:'m7-02', m:7, t:'mc', destaque:true, q:'As barragens contribuem para a erosão costeira porque…', o:['retêm os sedimentos dos rios, e chega menos areia às praias','aumentam o caudal dos rios','trazem mais areia para o mar','provocam o upwelling'], e:'Os sedimentos ficam na albufeira e as praias «emagrecem».' },
-    { id:'m7-03', m:7, t:'mc', q:'A construção sobre as arribas…', o:['aumenta a sua instabilidade e acelera o desmoronamento e o recuo','protege as arribas da abrasão','transforma-as em arribas mortas','não tem qualquer efeito'], e:'Construir sobre arribas, que já estão em erosão, aumenta a instabilidade e acelera o recuo (p. 276).' },
-    { id:'m7-04', m:7, t:'mc', q:'O pisoteio e a construção nas dunas são um problema porque…', o:['impedem a fixação da vegetação que estabiliza as dunas','aumentam a areia das praias','provocam upwelling','criam novas lagunas'], e:'Sem vegetação, as dunas não seguram a areia nem protegem a terra do mar.' },
-    { id:'m7-05', m:7, t:'mc', q:'A subida do nível médio do mar, por efeito do aquecimento global, pode…', o:['fazer desaparecer praias e reiniciar a erosão em arribas mortas','aumentar a largura das praias','transformar arribas vivas em mortas','reduzir a erosão costeira'], e:'Com menos sedimentos dos rios e o mar a subir, as praias desaparecem e até arribas mortas podem voltar a ser atacadas (p. 276).' },
-    { id:'m7-06', m:7, t:'mc', q:'A litoralização é…', o:['a concentração da população e das atividades junto ao litoral','a formação de praias pela deriva','a construção de esporões','a recuperação das dunas'], e:'Com o turismo, aumenta a pressão urbana sobre a linha de costa.' },
-    { id:'m7-07', m:7, t:'mc', destaque:true, q:'Os Programas da Orla Costeira (POC)…', o:['substituíram os POOC e regulam as atividades e usos da orla costeira','gerem as quotas de pesca','definem a ZEE','financiam a PCP'], e:'Os POC são mais interventivos do que os antigos Planos de Ordenamento da Orla Costeira.' },
-    { id:'m7-08', m:7, t:'mc', destaque:true, q:'O Plano de Ação Litoral XXI é…', o:['a base para programar as intervenções de gestão integrada da zona costeira','o plano que define a ZEE','um fundo europeu para a pesca','o plano das lotas'], e:'Da APA (2017): adaptação às alterações climáticas, sedimentos, riscos de erosão.' },
-    { id:'m7-09', m:7, t:'mc', destaque:true, q:'O PSOEM (Plano de Situação do Ordenamento do Espaço Marítimo)…', o:['caracteriza o espaço marítimo e define a distribuição dos seus usos e atividades','regula só as praias','define o preço do peixe','gere os portos de pesca'], e:'Objetivos: Portugal como país atlântico, valorizar o mar na economia, coesão nacional, maior Estado costeiro da UE.' },
-    { id:'m7-10', m:7, t:'mc', q:'Um dos objetivos do PSOEM é…', o:['valorizar Portugal como o maior Estado costeiro da UE','proibir o turismo no litoral','acabar com a aquicultura','reduzir a ZEE'], e:'O PSOEM quer valorizar Portugal como o maior Estado costeiro da UE e como país atlântico (p. 277).' },
-    { id:'m7-11', m:7, t:'mc', destaque:true, q:'A Economia Azul é…', o:['o conjunto das atividades económicas associadas ao mar e aos seus recursos, de forma sustentável','apenas a pesca','a economia dos países com bandeira azul','a indústria do turismo de montanha'], e:'Inclui pesca, aquicultura, portos, turismo, energia, biotecnologia, investigação…' },
-    { id:'m7-12', m:7, t:'mc', q:'Uma medida para proteger as dunas é…', o:['construir acessos pedonais sobrelevados (passadiços)','construir casas nas dunas','retirar a vegetação','abrir estradas até à praia'], e:'Os passadiços evitam o pisoteio.' },
-    { id:'m7-13', m:7, t:'mc', q:'O reforço sedimentar consiste em…', o:['colocar areia nas praias para compensar a erosão','construir paredões','retirar areia das praias','construir barragens'], e:'É uma das medidas contra a erosão costeira (Doc. 3, p. 279).' },
-    { id:'m7-14', m:7, t:'mc', q:'Enrocamentos e paredões são…', o:['proteções rígidas para suster o mar','acessos às praias','tipos de aquicultura','formas de upwelling'], e:'Proteções rígidas (pesadas) da linha de costa.' },
-    { id:'m7-15', m:7, t:'mc', q:'O WindFloat Atlantic é…', o:['o primeiro parque eólico flutuante semissubmersível do mundo','um navio-fábrica','um programa da orla costeira','uma reserva da Rede Natura 2000'], e:'Aproveita os ventos de oeste ao largo da costa ocidental.' },
-    { id:'m7-16', m:7, t:'mc', q:'A dessalinização da água do mar, já usada no Porto Santo, serve para…', o:['obter água potável','produzir sal','criar peixe','produzir eletricidade'], e:'A dessalinização tira o sal à água do mar para obter água potável, como no Porto Santo (p. 281).' },
-    { id:'m7-17', m:7, t:'mc', q:'Qual destas atividades é um exemplo de valorização turística do mar?', o:['Observação de cetáceos nos Açores','Construção sobre arribas','Lavagem de porões de petroleiros','Pesca de juvenis'], e:'Também o mergulho na Madeira e os passeios na costa algarvia.' },
-    { id:'m7-18', m:7, t:'mc', q:'As marés negras resultam sobretudo…', o:['da lavagem de porões de petroleiros e de derrames de hidrocarbonetos','do upwelling','das algas da aquicultura','da deriva litoral'], e:'A vigilância da costa ajuda a prevenir a lavagem ilegal de porões.' },
-    { id:'m7-19', m:7, t:'mc', q:'As áreas de maior erosão costeira, como Espinho–Cortegaça ou a Caparica, são também…', o:['as de maior ocupação humana','as de menor população','áreas sem praias','áreas de arribas mortas'], e:'As áreas com mais erosão são também as mais ocupadas por construção (Doc. 3, p. 279).' },
-    { id:'m7-20', m:7, t:'mc', q:'«Gestão integrada» do litoral significa…', o:['aplicar de forma articulada os planos e estratégias de gestão do litoral e do mar','que cada município faz o que quer','gerir só a pesca','construir mais esporões'], e:'Articulada com o PNPOT e os PGRH.' },
-    { id:'m7-21', m:7, t:'vf', q:'Os molhes retêm as areias transportadas pela deriva litoral, reduzindo os areais a sul.', a:true, e:'Verdadeiro (manual, p. 273).' },
-    { id:'m7-22', m:7, t:'vf', q:'Os POC são os antigos POOC com outro nome e exatamente o mesmo caráter.', a:false, e:'Falso: os POC substituíram os POOC, com uma organização diferente e um caráter mais interventivo.' },
-    { id:'m7-23', m:7, t:'vf', q:'A sobre-exploração dos recursos vivos reduz os stocks e pode pôr espécies em risco de extinção.', a:true, e:'Verdadeiro: pescar mais do que os peixes conseguem repor reduz os stocks e ameaça as espécies.' },
-    { id:'m7-24', m:7, t:'vf', q:'Os ventos de oeste viabilizam parques eólicos ao largo da costa ocidental.', a:true, e:'Verdadeiro (manual, p. 281).' },
-    { id:'m7-25', m:7, t:'vf', q:'O turismo deve desenvolver-se de forma ordenada, preservando os recursos naturais.', a:true, e:'Verdadeiro (manual, p. 278).' },
-    { id:'m7-26', m:7, t:'completa', q:'Os ___ substituíram os antigos Planos de Ordenamento da Orla Costeira.', o:['Programas da Orla Costeira','Planos de Ação Litoral XXI','fundos FEAMP','acordos de pesca'], e:'Programas da Orla Costeira (POC).' },
-    { id:'m7-27', m:7, t:'completa', q:'A ___ Azul é o conjunto das atividades económicas associadas ao mar.', o:['Economia','Bandeira','Reserva','Zona'], e:'Economia Azul (ou Economia do Mar).' },
-    { id:'m7-28', m:7, t:'mc', doc:'windfloat', q:'Segundo o documento, o WindFloat Atlantic contribui para…', o:['produzir energia limpa e evitar emissões de CO2','aumentar as capturas de sardinha','proteger as dunas','produzir sal'], e:'Energia para cerca de 60 mil utilizadores por ano, evitando 1,1 milhões de toneladas de CO2.' }
+    { id:'m7-01', m:7, s:0, t:'mc', destaque:true, q:'As obras de proteção da costa, como molhes e esporões, provocam…', o:['acumulação de areias a norte e maior erosão a sul','acumulação de areias a sul e erosão a norte','o fim da deriva litoral','o aumento das praias em toda a costa'], e:'Retêm as areias trazidas pela deriva litoral (de norte para sul): ganha-se areia a norte e perde-se a sul.' },
+    { id:'m7-02', m:7, s:0, t:'mc', destaque:true, q:'As barragens contribuem para a erosão costeira porque…', o:['retêm os sedimentos dos rios, e chega menos areia às praias','aumentam o caudal dos rios','trazem mais areia para o mar','provocam o upwelling'], e:'Os sedimentos ficam na albufeira e as praias «emagrecem».' },
+    { id:'m7-03', m:7, s:0, t:'mc', q:'A construção sobre as arribas…', o:['aumenta a sua instabilidade e acelera o desmoronamento e o recuo','protege as arribas da abrasão','transforma-as em arribas mortas','não tem qualquer efeito'], e:'Construir sobre arribas, que já estão em erosão, aumenta a instabilidade e acelera o recuo (p. 276).' },
+    { id:'m7-04', m:7, s:0, t:'mc', q:'O pisoteio e a construção nas dunas são um problema porque…', o:['impedem a fixação da vegetação que estabiliza as dunas','aumentam a areia das praias','provocam upwelling','criam novas lagunas'], e:'Sem vegetação, as dunas não seguram a areia nem protegem a terra do mar.' },
+    { id:'m7-05', m:7, s:0, t:'mc', q:'A subida do nível médio do mar, por efeito do aquecimento global, pode…', o:['fazer desaparecer praias e reiniciar a erosão em arribas mortas','aumentar a largura das praias','transformar arribas vivas em mortas','reduzir a erosão costeira'], e:'Com menos sedimentos dos rios e o mar a subir, as praias desaparecem e até arribas mortas podem voltar a ser atacadas (p. 276).' },
+    { id:'m7-06', m:7, s:0, t:'mc', q:'A litoralização é…', o:['a concentração da população e das atividades junto ao litoral','a formação de praias pela deriva','a construção de esporões','a recuperação das dunas'], e:'Com o turismo, aumenta a pressão urbana sobre a linha de costa.' },
+    { id:'m7-07', m:7, s:1, t:'mc', destaque:true, q:'Os Programas da Orla Costeira (POC)…', o:['substituíram os POOC e regulam as atividades e usos da orla costeira','gerem as quotas de pesca','definem a ZEE','financiam a PCP'], e:'Os POC são mais interventivos do que os antigos Planos de Ordenamento da Orla Costeira.' },
+    { id:'m7-08', m:7, s:1, t:'mc', destaque:true, q:'O Plano de Ação Litoral XXI é…', o:['a base para programar as intervenções de gestão integrada da zona costeira','o plano que define a ZEE','um fundo europeu para a pesca','o plano das lotas'], e:'Da APA (2017): adaptação às alterações climáticas, sedimentos, riscos de erosão.' },
+    { id:'m7-09', m:7, s:1, t:'mc', destaque:true, q:'O PSOEM (Plano de Situação do Ordenamento do Espaço Marítimo)…', o:['caracteriza o espaço marítimo e define a distribuição dos seus usos e atividades','regula só as praias','define o preço do peixe','gere os portos de pesca'], e:'Objetivos: Portugal como país atlântico, valorizar o mar na economia, coesão nacional, maior Estado costeiro da UE.' },
+    { id:'m7-10', m:7, s:1, t:'mc', q:'Um dos objetivos do PSOEM é…', o:['valorizar Portugal como o maior Estado costeiro da UE','proibir o turismo no litoral','acabar com a aquicultura','reduzir a ZEE'], e:'O PSOEM quer valorizar Portugal como o maior Estado costeiro da UE e como país atlântico (p. 277).' },
+    { id:'m7-11', m:7, s:3, t:'mc', destaque:true, q:'A Economia Azul é…', o:['o conjunto das atividades económicas associadas ao mar e aos seus recursos, de forma sustentável','apenas a pesca','a economia dos países com bandeira azul','a indústria do turismo de montanha'], e:'Inclui pesca, aquicultura, portos, turismo, energia, biotecnologia, investigação…' },
+    { id:'m7-12', m:7, s:2, t:'mc', q:'Uma medida para proteger as dunas é…', o:['construir acessos pedonais sobrelevados (passadiços)','construir casas nas dunas','retirar a vegetação','abrir estradas até à praia'], e:'Os passadiços evitam o pisoteio.' },
+    { id:'m7-13', m:7, s:2, t:'mc', q:'O reforço sedimentar consiste em…', o:['colocar areia nas praias para compensar a erosão','construir paredões','retirar areia das praias','construir barragens'], e:'É uma das medidas contra a erosão costeira (Doc. 3, p. 279).' },
+    { id:'m7-14', m:7, s:2, t:'mc', q:'Enrocamentos e paredões são…', o:['proteções rígidas para suster o mar','acessos às praias','tipos de aquicultura','formas de upwelling'], e:'Proteções rígidas (pesadas) da linha de costa.' },
+    { id:'m7-15', m:7, s:3, t:'mc', q:'O WindFloat Atlantic é…', o:['o primeiro parque eólico flutuante semissubmersível do mundo','um navio-fábrica','um programa da orla costeira','uma reserva da Rede Natura 2000'], e:'Aproveita os ventos de oeste ao largo da costa ocidental.' },
+    { id:'m7-16', m:7, s:3, t:'mc', q:'A dessalinização da água do mar, já usada no Porto Santo, serve para…', o:['obter água potável','produzir sal','criar peixe','produzir eletricidade'], e:'A dessalinização tira o sal à água do mar para obter água potável, como no Porto Santo (p. 281).' },
+    { id:'m7-17', m:7, s:3, t:'mc', q:'Qual destas atividades é um exemplo de valorização turística do mar?', o:['Observação de cetáceos nos Açores','Construção sobre arribas','Lavagem de porões de petroleiros','Pesca de juvenis'], e:'Também o mergulho na Madeira e os passeios na costa algarvia.' },
+    { id:'m7-18', m:7, s:0, t:'mc', q:'As marés negras resultam sobretudo…', o:['da lavagem de porões de petroleiros e de derrames de hidrocarbonetos','do upwelling','das algas da aquicultura','da deriva litoral'], e:'A vigilância da costa ajuda a prevenir a lavagem ilegal de porões.' },
+    { id:'m7-19', m:7, s:0, t:'mc', q:'As áreas de maior erosão costeira, como Espinho–Cortegaça ou a Caparica, são também…', o:['as de maior ocupação humana','as de menor população','áreas sem praias','áreas de arribas mortas'], e:'As áreas com mais erosão são também as mais ocupadas por construção (Doc. 3, p. 279).' },
+    { id:'m7-20', m:7, s:1, t:'mc', q:'«Gestão integrada» do litoral significa…', o:['aplicar de forma articulada os planos e estratégias de gestão do litoral e do mar','que cada município faz o que quer','gerir só a pesca','construir mais esporões'], e:'Articulada com o PNPOT e os PGRH.' },
+    { id:'m7-21', m:7, s:0, t:'vf', q:'Os molhes retêm as areias transportadas pela deriva litoral, reduzindo os areais a sul.', a:true, e:'Verdadeiro (manual, p. 273).' },
+    { id:'m7-22', m:7, s:1, t:'vf', q:'Os POC são os antigos POOC com outro nome e exatamente o mesmo caráter.', a:false, e:'Falso: os POC substituíram os POOC, com uma organização diferente e um caráter mais interventivo.' },
+    { id:'m7-23', m:7, s:0, t:'vf', q:'A sobre-exploração dos recursos vivos reduz os stocks e pode pôr espécies em risco de extinção.', a:true, e:'Verdadeiro: pescar mais do que os peixes conseguem repor reduz os stocks e ameaça as espécies.' },
+    { id:'m7-24', m:7, s:3, t:'vf', q:'Os ventos de oeste viabilizam parques eólicos ao largo da costa ocidental.', a:true, e:'Verdadeiro (manual, p. 281).' },
+    { id:'m7-25', m:7, s:3, t:'vf', q:'O turismo deve desenvolver-se de forma ordenada, preservando os recursos naturais.', a:true, e:'Verdadeiro (manual, p. 278).' },
+    { id:'m7-26', m:7, s:1, t:'completa', q:'Os ___ substituíram os antigos Planos de Ordenamento da Orla Costeira.', o:['Programas da Orla Costeira','Planos de Ação Litoral XXI','fundos FEAMP','acordos de pesca'], e:'Programas da Orla Costeira (POC).' },
+    { id:'m7-27', m:7, s:3, t:'completa', q:'A ___ Azul é o conjunto das atividades económicas associadas ao mar.', o:['Economia','Bandeira','Reserva','Zona'], e:'Economia Azul (ou Economia do Mar).' },
+    { id:'m7-28', m:7, s:3, t:'mc', doc:'windfloat', q:'Segundo o documento, o WindFloat Atlantic contribui para…', o:['produzir energia limpa e evitar emissões de CO2','aumentar as capturas de sardinha','proteger as dunas','produzir sal'], e:'Energia para cerca de 60 mil utilizadores por ano, evitando 1,1 milhões de toneladas de CO2.' }
   ],
 
   /* Frases para classificar (minijogo "Classifica rápido", lições e teste final) */
@@ -1267,7 +1295,7 @@ const NM = C.mundos.length; // número de mundos
 const CHAVE = 'rota-do-mar-v1';
 // prog: jogos a meio (mundos "m1"…"m7", "teste", "sim"), para continuar onde se parou
 // abertos: mundos já desbloqueados (continuam abertos mesmo que se recomece o anterior)
-const base = () => ({ xp:0, mundos:{}, erros:{}, cartoes:{}, recordes:{}, teste:null, prog:{}, abertos:[], def:{ fundo:true, som:false } });
+const base = () => ({ xp:0, mundos:{}, erros:{}, cartoes:{}, recordes:{}, teste:null, prog:{}, abertos:[], def:{ fundo:true, som:false, mar:false, vibrar:false } });
 function carregar(){ try { const r = localStorage.getItem(CHAVE); return r ? JSON.parse(r) : null; } catch(e){ return null; } }
 function guardar(){ try { localStorage.setItem(CHAVE, JSON.stringify(S)); } catch(e){} }
 let S = base();
@@ -1288,7 +1316,7 @@ const $app = $('#app');
 let TIMERS = [];
 let combo = 0;
 
-function limpar(){ TIMERS.forEach(clearInterval); TIMERS = []; fecharMateria(); }
+function limpar(){ TIMERS.forEach(clearInterval); TIMERS = []; fecharMateria(); document.body.classList.remove('foco'); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function baralhar(a){ const b = a.slice(); for (let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 function sorte(a){ return a[Math.floor(Math.random() * a.length)]; }
@@ -1317,11 +1345,11 @@ function acerto(){
   guardar(); toast(msg, 'xp'); mostrarCombo();
   FUNDO.squishTodos(); // animação do fundo (o som toca à parte, mesmo com o fundo desligado)
   const depois = nivel(S.xp).i;
-  tocar('certo');
+  tocar('certo'); vibrar(12);
   if (depois > antes){ setTimeout(() => toast('Subiste para o Nível ' + (depois + 1) + ': ' + C.niveis[depois].nome + '!'), 400); setTimeout(() => tocar('nivel'), 350); }
 }
 function erro(id){
-  combo = 0; mostrarCombo(); tocar('errado');
+  combo = 0; mostrarCombo(); tocar('errado'); vibrar([18, 40, 18]);
   if (id){ S.erros[id] = { s:0 }; guardar(); }
 }
 
@@ -1373,8 +1401,49 @@ function temaMini(cod){
   return m ? m.n : 0;
 }
 
+/* Minutos estimados para um mundo (matéria + perguntas + desafios) */
+function minutos(n){
+  const m = C.mundos[n - 1], partes = C.licoes[n].seccoes.filter(s => !s.quiz).length;
+  return Math.max(5, Math.round((partes * 1.5 + m.nPerguntas * 0.5 + m.especiais.length * 1.5) / 5) * 5);
+}
+const listaMundos = ms => { const t = ms.map(m => 'Mundo ' + m.n); return t.length > 1 ? t.slice(0, -1).join(', ') + ' e ' + t[t.length - 1] : t[0]; };
+
+/* O botão «Continuar»: o próximo passo certo para o aluno */
+function proximoPasso(){
+  const emCurso = C.mundos.find(m => progOk('m' + m.n));
+  if (emCurso){ const pg = S.prog['m' + emCurso.n]; return { t:'Continuar o Mundo ' + emCurso.n, d:esc(emCurso.titulo) + ' · passo ' + (pg.k + 1) + ' de ' + pg.passos.length, f:() => jogarMundo(emCurso.n) }; }
+  if (simValida(S.prog.sim)) return { t:'Continuar a Simulação', d:esc(descreverSim(S.prog.sim)), f:simulacao };
+  const prox = C.mundos.find(m => desbloqueado(m.n) && infoMundo(m.n).best < 0.7);
+  if (prox) return { t:(S.mundos[prox.n] ? 'Repetir o Mundo ' : 'Começar o Mundo ') + prox.n, d:esc(prox.titulo) + ' · ≈ ' + minutos(prox.n) + ' min', f:() => jogarMundo(prox.n) };
+  if (!S.simulacao) return { t:'Fazer a Simulação do Teste', d:'Já passaste todos os mundos: agora treina como no teste real.', f:simulacao };
+  const ne = errosAtivos().length;
+  if (ne) return { t:'Rever os erros', d:ne + (ne === 1 ? ' pergunta' : ' perguntas') + ' para dominar', f:revisao };
+  return { t:'Fazer outra Simulação', d:'Melhor nota: ' + virgula(S.simulacao.melhor) + ' valores', f:simulacao };
+}
+
+/* Plano até ao teste: o aluno diz a data e o jogo diz o que fazer hoje */
+function htmlPlano(){
+  const d = S.def.dataTeste;
+  if (!d) return '<section class="plano"><p class="pl-t">Quando é o teste?</p><p class="small muted">Diz a data e o jogo diz-te o que fazer em cada dia.</p>' +
+    '<div class="pl-row"><input type="date" id="pl-data" aria-label="Data do teste"><button class="btn" id="pl-ok" type="button">Guardar</button></div></section>';
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const dt = new Date(d + 'T00:00:00'), dias = Math.round((dt - hoje) / 864e5);
+  const falta = C.mundos.filter(m => infoMundo(m.n).best < 0.7);
+  let txt;
+  if (dias < 0) txt = 'O teste já passou. Se tiveres outro, muda a data.';
+  else if (dias === 0) txt = '<b>O teste é hoje!</b> Nada de matéria nova: lê os cartões de resposta aberta e faz a revisão dos erros.';
+  else if (dias === 1) txt = '<b>O teste é amanhã.</b> Hoje: ' + (falta.length ? 'acaba o ' + listaMundos(falta) + ' e depois ' : '') + 'faz a Simulação do Teste e a revisão dos erros.';
+  else {
+    const hojeM = falta.slice(0, Math.ceil(falta.length / (dias - 1)));
+    txt = '<b>Faltam ' + dias + ' dias.</b> ' + (hojeM.length ? 'Hoje: ' + listaMundos(hojeM) + ' (≈ ' + hojeM.reduce((s, m) => s + minutos(m.n), 0) + ' min).' : 'Já fizeste os mundos todos: faz a Simulação e a revisão dos erros.') +
+      ' Na véspera: Simulação do Teste e revisão dos erros.';
+  }
+  return '<section class="plano"><p class="pl-t">Plano até ao teste · ' + esc(dt.toLocaleDateString('pt-PT', { day:'numeric', month:'long' })) + '</p><p>' + txt + '</p>' +
+    '<button class="link-b" id="pl-mudar" type="button">Mudar a data</button></section>';
+}
+
 /* =====================================================================
-   ECRÃ INICIAL
+   ECRÃ INICIAL — primeiro o botão «Continuar»; o resto está arrumado em secções que abrem
    ===================================================================== */
 function inicio(){
   limpar(); combo = 0; topo();
@@ -1383,18 +1452,19 @@ function inicio(){
   const nErros = errosAtivos().length;
   const nSabidos = C.cartoes.filter(c => S.cartoes[c.id] === 1).length;
   const meander = '<div class="meander" aria-hidden="true"><svg preserveAspectRatio="none"><defs><pattern id="mq" width="24" height="12" patternUnits="userSpaceOnUse"><path d="M0 7Q6 1 12 7T24 7" fill="none" stroke="currentColor" stroke-width="1.6"/></pattern></defs><rect width="100%" height="12" fill="url(#mq)"/></svg></div>';
+  const px = proximoPasso(), relax = S.def.som && S.def.mar;
 
   const mundos = C.mundos.map(m => {
     const inf = infoMundo(m.n), livre = desbloqueado(m.n), feito = inf.best >= 0.7, pg = progOk('m' + m.n) && S.prog['m' + m.n];
     return '<li><div class="mrow"><button class="mundo ' + (feito ? 'feito' : '') + '" data-m="' + m.n + '" ' + (livre ? '' : 'disabled') + ' type="button">' +
       '<span class="no" aria-hidden="true">' + m.letra + '</span>' +
-      '<span class="tx"><span class="eyebrow">Mundo ' + m.n + '</span><span class="tt">' + esc(m.titulo) + '</span><span class="rs">' + esc(m.resumo) + '</span>' +
+      '<span class="tx"><span class="eyebrow">Mundo ' + m.n + ' · ≈ ' + minutos(m.n) + ' min</span><span class="tt">' + esc(m.titulo) + '</span><span class="rs">' + esc(m.resumo) + '</span>' +
       '<span class="rw">' + (livre ? estrelasHTML(inf.est) +
-          (pg ? '<span class="chip cont">continua na pergunta ' + (pg.k + 1) + ' de ' + pg.passos.length + '</span>' : inf.best ? '<span class="pct">melhor: ' + Math.round(inf.best * 100) + '%</span>' : '<span class="pct">começa com a lição</span>')
+          (pg ? '<span class="chip cont">continua no passo ' + (pg.k + 1) + ' de ' + pg.passos.length + '</span>' : inf.best ? '<span class="pct">melhor: ' + Math.round(inf.best * 100) + '%</span>' : '')
         : '<span class="chip lock">' + LOCK + 'Faz 70% no Mundo ' + (m.n - 1) + ' para abrir</span>') +
-      (m.teste ? '<span class="chip">Sai no teste</span>' : '') + '</span></span></button>' +
+      '</span></span></button>' +
       (temProgresso(m.n) ? '<button class="reset-b" data-reset="' + m.n + '" type="button" aria-label="Recomeçar o Mundo ' + m.n + '" title="Recomeçar este mundo">↺</button>' : '') + '</div>' +
-      (pr === m.n ? '<div class="confirma" id="confirma"><p>Recomeçar o <b>Mundo ' + m.n + '</b>? Perdes as estrelas' + (pg ? ' e a pergunta onde ias' : '') + '. Os outros mundos continuam abertos.</p>' +
+      (pr === m.n ? '<div class="confirma" id="confirma"><p>Recomeçar o <b>Mundo ' + m.n + '</b>? Perdes as estrelas' + (pg ? ' e o passo onde ias' : '') + '. Os outros mundos continuam abertos.</p>' +
         '<div class="acts"><button class="btn danger" id="rs-sim" type="button">Sim, recomeçar</button><button class="btn ghost" id="rs-nao" type="button">Cancelar</button></div></div>' : '') + '</li>';
   }).join('');
 
@@ -1404,38 +1474,45 @@ function inicio(){
   if (ps) resets.push(['r-simul', '↺ Recomeçar a simulação']);
   if (nErros) resets.push(['r-erros', 'Limpar a revisão dos erros (' + nErros + ')']);
   if (nSabidos) resets.push(['r-cart', 'Pôr os cartões todos como “por saber”']);
+  const dobra = (id, titulo, extra, corpo) => '<details class="dobra" id="' + id + '"' + (S.def.abertas && S.def.abertas[id] ? ' open' : '') + '><summary><span>' + titulo + '</span>' + (extra ? '<span class="pct">' + extra + '</span>' : '') + '</summary><div class="dobra-c">' + corpo + '</div></details>';
+  const def = (id, rot, on) => '<button class="mini-b" id="' + id + '" type="button" aria-pressed="' + !!on + '">' + rot + ': ' + (on ? 'ligado' : 'desligado') + '</button>';
 
   $app.innerHTML =
   '<div class="wrap">' +
     '<header class="hero"><div><p class="eyebrow">Os recursos marítimos</p><h1>Rota do Mar <span class="sub">— Geografia 11.º ano</span></h1></div>' +
       '<div class="epoche" aria-hidden="true"><b>12 · 24 · 200</b><span>milhas náuticas</span></div></header>' +
     meander +
+    '<button class="continuar" id="b-cont" type="button"><span class="ct-i" aria-hidden="true">▶</span><span class="ct-tx"><span class="ct-t">' + px.t + '</span><span class="ct-d">' + px.d + '</span></span></button>' +
+    '<div class="relax-row"><button class="relax' + (relax ? ' on' : '') + '" id="b-relax" type="button" aria-pressed="' + relax + '"><span aria-hidden="true">〰</span> Modo relaxar (ASMR): ' + (relax ? 'ligado' : 'desligado') + '</button>' +
+      '<span class="small muted">' + (relax ? 'Ondas do mar e bolhas com som. Toca nas bolhas!' : 'Som das ondas e bolhas que rebentam') + '</span></div>' +
+    htmlPlano() +
     '<section class="player" aria-label="O teu nível"><div class="lvl">' + (nv.i + 1) + '</div><div><p class="eyebrow">Nível ' + (nv.i + 1) + '</p><p class="nm">' + esc(nv.nome) + '</p>' +
       '<div class="xpbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(nv.prog * 100) + '"><i style="width:' + (nv.prog * 100) + '%"></i></div>' +
       '<p class="meta"><span>' + S.xp + ' XP</span><span>' + (nv.prox ? 'faltam ' + nv.falta + ' XP para ' + esc(nv.prox.nome) : 'nível máximo!') + '</span></p></div></section>' +
-    '<p class="aviso"><b>Sai no teste:</b> Recursos marítimos (Manual do 10.º ano, pp. 242–281): litoral, zonas marítimas e ZEE, fatores do pescado, pesca, aquicultura, salicultura, gestão do litoral e Economia Azul. <b>Formato:</b> escolha múltipla, verdadeiro/falso, completamento, associação, ordenação, resposta curta, restrita e extensa, com textos, gráficos, mapas e figuras.</p>' +
-    '<section class="acoes"><button class="acao estudo" id="b-mat" type="button"><span class="t">Aprender a matéria</span><span class="d">Começa por aqui: a matéria dos ' + NM + ' mundos explicada, com mapas, esquemas, exemplos e truques. Cada mundo também abre com a sua lição.</span></button></section>' +
-    '<section><div class="sec-h"><h2>Rota dos mundos</h2><span class="pct">' + C.mundos.filter(m => infoMundo(m.n).best >= 0.7).length + '/' + NM + ' completos</span></div></section>' +
+    '<section><div class="sec-h"><h2>Rota dos mundos</h2><span class="pct">' + C.mundos.filter(m => infoMundo(m.n).best >= 0.7).length + '/' + NM + ' completos</span></div>' +
+      '<p class="small muted" style="margin-top:6px">Em cada mundo, a matéria vem aos bocadinhos: uma parte, umas perguntas, outra parte… Precisas de 70% para abrir o seguinte.</p></section>' +
     '<ol class="mapa">' + mundos + '</ol>' +
     '<section class="acoes">' +
-      '<button class="acao" id="b-cartoes" type="button"><span class="t">Cartões de estudo</span><span class="d">' + C.cartoes.length + ' cartões por tema, incluindo as respostas abertas do teste · já sabes ' + nSabidos + '</span></button>' +
+      '<button class="acao final" id="b-sim" type="button"><span class="t">Simulação do Teste</span><span class="d">' + (ps ? '<b>Continua: ' + esc(descreverSim(ps)) + '</b>' : 'Igual ao teste real, com nota de 0 a 20' + (S.simulacao ? ' · melhor: ' + virgula(S.simulacao.melhor) + ' valores' : '')) + '</span></button>' +
       '<button class="acao" id="b-rev" type="button"><span class="t">Revisão dos erros' + (nErros ? '<span class="badge">' + nErros + '</span>' : '') + '</span><span class="d">' + (nErros ? 'Acerta cada uma 2 vezes seguidas' : 'Ainda não há erros guardados') + '</span></button>' +
-      '<button class="acao" id="b-teste" type="button"><span class="t">Teste final</span><span class="d">' + (pt ? '<b>Continua na pergunta ' + (pt.k + 1) + ' de ' + pt.passos.length + '</b>' : '20 perguntas rápidas, nota de 0 a 20' + (S.teste ? ' · melhor: ' + S.teste.melhor + ' valores' : '')) + '</span></button>' +
-      '<button class="acao final" id="b-sim" type="button"><span class="t">Simulação do Teste</span><span class="d">' + (ps ? '<b>Continua: ' + descreverSim(ps) + '</b>' : 'Igual ao teste real: ' + C.simulacao.grupos.length + ' grupos, com documentos, mapa e respostas escritas' + (S.simulacao ? ' · melhor: ' + virgula(S.simulacao.melhor) + ' valores' : '')) + '</span></button>' +
+      '<button class="acao" id="b-cartoes" type="button"><span class="t">Cartões de estudo</span><span class="d">Respostas abertas e conceitos · já sabes ' + nSabidos + ' de ' + C.cartoes.length + '</span></button>' +
+      '<button class="acao" id="b-teste" type="button"><span class="t">Teste final</span><span class="d">' + (pt ? '<b>Continua na pergunta ' + (pt.k + 1) + ' de ' + pt.passos.length + '</b>' : '20 perguntas rápidas, ≈ 10 min' + (S.teste ? ' · melhor: ' + S.teste.melhor + ' valores' : '')) + '</span></button>' +
+      '<button class="acao" id="b-mat" type="button"><span class="t">Matéria toda</span><span class="d">Ler ou rever a matéria de um tema de seguida, com mapas e esquemas</span></button>' +
     '</section>' +
-    '<section style="display:flex;flex-direction:column;gap:10px"><div class="sec-h"><h2>Minijogos rápidos</h2></div><div class="minis">' +
-      MINIS.map(x => '<button class="mini-b" data-mini="' + x[0] + '" type="button">' + esc(x[1]) + '</button>').join('') +
-    '</div></section>' +
-    (resets.length ? '<section style="display:flex;flex-direction:column;gap:10px"><div class="sec-h"><h2>Recomeçar</h2><span class="pct">toca duas vezes para confirmar</span></div><div class="minis">' +
-      resets.map(r => '<button class="mini-b" id="' + r[0] + '" type="button">' + esc(r[1]) + '</button>').join('') + '</div><p class="small muted">Para recomeçar um mundo, usa o botão ↺ ao lado dele no mapa.</p></section>' : '') +
-    '<section style="display:flex;flex-direction:column;gap:10px"><div class="sec-h"><h2>Definições</h2></div><div class="minis">' +
-      '<button class="mini-b" id="d-fundo" type="button" aria-pressed="' + S.def.fundo + '">Fundo: ' + (S.def.fundo ? 'ligado' : 'desligado') + '</button>' +
-      '<button class="mini-b" id="d-som" type="button" aria-pressed="' + S.def.som + '">Som: ' + (S.def.som ? 'ligado' : 'desligado') + '</button>' +
-      (S.def.som ? '<button class="mini-b" id="d-teste-som" type="button">Testar o som</button>' : '') +
-    '</div>' + (S.def.som ? '<p class="small muted">Ouves um som ao acertar, ao errar, ao subir de nível e ao tocar nas bolhas do fundo. No iPhone, se o telemóvel estiver em silêncio (botão lateral), não se ouve nada: tira-o do silêncio e sobe o volume.</p>' : '') + '</section>' +
+    dobra('d-minis', 'Minijogos rápidos', MINIS.length + ' jogos', '<div class="minis">' + MINIS.map(x => '<button class="mini-b" data-mini="' + x[0] + '" type="button">' + esc(x[1]) + '</button>').join('') + '</div>') +
+    dobra('d-teste', 'O que sai no teste', '', '<p>Recursos marítimos (Manual do 10.º ano, pp. 242–281): litoral, zonas marítimas e ZEE, fatores do pescado, pesca, aquicultura, salicultura, gestão do litoral e Economia Azul.</p><p style="margin-top:8px"><b>Tipos de pergunta:</b> escolha múltipla, verdadeiro/falso, completamento, associação, ordenação, resposta curta, restrita e extensa, com textos, gráficos, mapas e figuras.</p>') +
+    dobra('d-def', 'Definições', '', '<div class="minis">' + def('d-fundo', 'Fundo animado', S.def.fundo) + def('d-som', 'Sons', S.def.som) + def('d-mar', 'Som das ondas', S.def.mar) + def('d-vib', 'Vibração', S.def.vibrar) +
+      (S.def.som ? '<button class="mini-b" id="d-teste-som" type="button">Testar o som</button>' : '') + '</div>' +
+      '<p class="small muted" style="margin-top:8px">Sons: ao acertar, ao errar, ao subir de nível e ao rebentar bolhas. O som das ondas precisa dos sons ligados. A vibração só funciona em Android. No iPhone, com o botão lateral em silêncio, não se ouve nada.</p>') +
+    (resets.length ? dobra('d-reset', 'Recomeçar', 'toca duas vezes', '<div class="minis">' + resets.map(r => '<button class="mini-b" id="' + r[0] + '" type="button">' + esc(r[1]) + '</button>').join('') + '</div><p class="small muted" style="margin-top:8px">Para recomeçar um mundo, usa o botão ↺ ao lado dele.</p>') : '') +
     '<footer class="rodape"><p>O progresso fica guardado neste browser, neste dispositivo: XP, estrelas, jogos a meio, erros, cartões e o texto que escreves. Podes sair a meio e continuar depois.</p><div class="row" id="reset-row"><button class="link-b" id="b-reset" type="button">Apagar todo o progresso</button></div></footer>' +
   '</div>';
 
+  $('#b-cont').onclick = px.f;
+  $('#b-relax').onclick = () => { const on = !(S.def.som && S.def.mar); S.def.som = on; S.def.mar = on; if (on) S.def.fundo = true; guardar(); FUNDO.aplicar(); marAmbiente(); if (on) tocar('pop'); inicio(); };
+  const pd = $('#pl-ok'); if (pd) pd.onclick = () => { const v = $('#pl-data').value; if (!v){ toast('Escolhe a data do teste.'); return; } S.def.dataTeste = v; guardar(); inicio(); };
+  const pm = $('#pl-mudar'); if (pm) pm.onclick = () => { delete S.def.dataTeste; guardar(); inicio(); };
+  $app.querySelectorAll('details.dobra').forEach(d => d.ontoggle = () => { S.def.abertas = Object.assign({}, S.def.abertas, { [d.id]:d.open }); guardar(); });
   $app.querySelectorAll('.mundo').forEach(b => b.onclick = () => jogarMundo(+b.dataset.m));
   $app.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => {
     pedirReset = +b.dataset.reset; inicio();
@@ -1456,7 +1533,9 @@ function inicio(){
   liga('r-cart', () => { S.cartoes = {}; }, 'Cartões todos por saber.');
   const ts = $('#d-teste-som'); if (ts) ts.onclick = () => tocar('certo');
   $('#d-fundo').onclick = () => { S.def.fundo = !S.def.fundo; guardar(); FUNDO.aplicar(); inicio(); };
-  $('#d-som').onclick = () => { S.def.som = !S.def.som; guardar(); if (S.def.som) tocar('certo'); inicio(); };
+  $('#d-som').onclick = () => { S.def.som = !S.def.som; guardar(); marAmbiente(); if (S.def.som) tocar('certo'); inicio(); };
+  $('#d-mar').onclick = () => { S.def.mar = !S.def.mar; if (S.def.mar) S.def.som = true; guardar(); marAmbiente(); inicio(); };
+  $('#d-vib').onclick = () => { S.def.vibrar = !S.def.vibrar; guardar(); vibrar(15); inicio(); };
   $('#b-reset').onclick = () => {
     $('#reset-row').innerHTML = '<span>Apagar XP, estrelas, jogos a meio, erros e cartões?</span><button class="btn danger" id="r-sim" type="button">Sim, apagar</button><button class="btn ghost" id="r-nao" type="button">Cancelar</button>';
     $('#r-sim').onclick = () => { const d = S.def; S = base(); S.def = d; guardar(); inicio(); toast('Progresso apagado.'); };
@@ -1529,13 +1608,15 @@ function jogar(titulo, passos, fim, modo, chave, materiaN){
   const sv = chave && S.prog[chave];
   if (sv){ passos = sv.passos.map(desPasso); k = sv.k; cred = sv.cred; xp0 = S.xp - (sv.xp || 0); res = sv.res.map((x, j) => desRes(x, passos[j])); }
   const gravar = () => { if (chave){ S.prog[chave] = { passos:passos.map(serPasso), k, cred, xp:S.xp - xp0, res:res.map(serRes) }; guardar(); } };
+  const conta = () => passos.filter(p => p.k !== 'licao').length; // as partes de matéria não contam para a nota
   const passo = () => {
-    topo();
-    if (k >= passos.length){ if (chave){ delete S.prog[chave]; guardar(); } return fim({ cred, total:passos.length, res, xp:S.xp - xp0 }); }
+    topo(); document.body.classList.remove('foco');
+    if (k >= passos.length){ if (chave){ delete S.prog[chave]; guardar(); } return fim({ cred, total:conta(), res, xp:S.xp - xp0 }); }
     ctx.prog(k / passos.length, (k + 1) + '/' + passos.length);
     const p = passos[k];
     const done = (c, extra) => { cred += c; res.push(Object.assign({ p, c }, extra || {})); k++; gravar(); passo(); };
-    if (p.k === 'q') telaPergunta(ctx, p.it, (ok, Q, i) => done(ok ? 1 : 0, { ok, Q, i }));
+    if (p.k === 'licao') telaParte(ctx, p, passos[k + 1], () => done(0));
+    else if (p.k === 'q') telaPergunta(ctx, p.it, (ok, Q, i) => done(ok ? 1 : 0, { ok, Q, i }));
     else if (p.k === 'ordem') telaOrdem(ctx, p.set, done);
     else if (p.k === 'mapa') telaMapa(ctx, p.set, null, null, c => done(c));
     else if (p.k === 'ligar') telaLigar(ctx, p.set, done);
@@ -1544,17 +1625,63 @@ function jogar(titulo, passos, fim, modo, chave, materiaN){
   passo();
 }
 
-function jogarMundo(n, saltarLicao){
+/* Passos de um mundo: parte de matéria → perguntas sobre essa parte → parte seguinte… e, no fim, os desafios.
+   Cada pergunta tem "s" (a secção da lição onde a matéria é explicada), por isso nunca aparece antes da matéria. */
+function passosMundo(n, comMateria){
+  const m = C.mundos[n - 1], L = C.licoes[n];
+  const partes = L.seccoes.map((s, i) => ({ s, i })).filter(x => !x.s.quiz);
+  const pools = partes.map(x => baralhar(C.perguntas.filter(p => p.m === n && p.s === x.i)));
+  const total = pools.reduce((a, b) => a + b.length, 0);
+  const quotas = pools.map(p => p.length ? Math.max(1, Math.round(m.nPerguntas * p.length / total)) : 0);
+  const soma = () => quotas.reduce((a, b) => a + b, 0);
+  while (soma() > m.nPerguntas){ const j = quotas.indexOf(Math.max.apply(null, quotas)); quotas[j]--; }
+  while (soma() < m.nPerguntas){ let j = -1, folga = 0; pools.forEach((p, i) => { if (p.length - quotas[i] > folga){ folga = p.length - quotas[i]; j = i; } }); if (j < 0) break; quotas[j]++; }
+  const passos = [];
+  partes.forEach((x, j) => {
+    if (comMateria) passos.push({ k:'licao', n, i:x.i, parte:j + 1, de:partes.length });
+    pools[j].slice(0, quotas[j]).forEach(it => passos.push({ k:'q', it }));
+  });
+  return passos.concat(m.especiais.map(e => Object.assign({}, e)));
+}
+
+function jogarMundo(n, soPerguntas){
   const m = C.mundos[n - 1];
   combo = 0;
   if (progOk('m' + n)) return jogar('Mundo ' + n + ' · ' + m.titulo, [], r => fimMundo(n, r), 'normal', 'm' + n, n);
-  const comecar = () => {
-    const passos = baralhar(C.perguntas.filter(p => p.m === n)).slice(0, m.nPerguntas).map(it => ({ k:'q', it }));
-    const esp = m.especiais, L = passos.length;
-    esp.forEach((s, i) => { passos.splice(Math.round((i + 1) * L / (esp.length + 1)) + i, 0, s); });
-    jogar('Mundo ' + n + ' · ' + m.titulo, passos, r => fimMundo(n, r), 'normal', 'm' + n, n);
-  };
-  if (saltarLicao) comecar(); else telaLicao(n, comecar);
+  if (soPerguntas == null) return telaInicioMundo(n);
+  jogar('Mundo ' + n + ' · ' + m.titulo, passosMundo(n, !soPerguntas), r => fimMundo(n, r), 'normal', 'm' + n, n);
+}
+
+/* Ecrã de entrada de um mundo: quanto tempo demora e como funciona */
+function telaInicioMundo(n){
+  limpar(); topo();
+  const m = C.mundos[n - 1], jaJogou = !!S.mundos[n], partes = C.licoes[n].seccoes.filter(s => !s.quiz).length;
+  const nomes = { mapa:'legendar', ordem:'ordenar', ligar:'ligar', sprint:'classificar em 60 s' };
+  $app.innerHTML = '<div class="wrap" style="gap:14px"><header class="playbar"><button class="icon-btn" id="sair" type="button" aria-label="Sair para o início">✕</button>' +
+    '<div class="pb-mid"><p class="pb-title">Mundo ' + n + '</p><div class="bar"><i style="width:0"></i></div></div><span></span><span></span></header>' +
+    '<article class="mini pop-in"><p class="tag">Mundo ' + n + ' · ≈ ' + minutos(n) + ' min</p><h2 class="qtext">' + esc(m.titulo) + '</h2><p class="lead">' + esc(m.resumo) + '</p>' +
+    '<ol class="passos-m"><li><b>' + partes + ' partes de matéria</b>, curtas, cada uma seguida de perguntas só sobre isso</li>' +
+      '<li><b>' + m.nPerguntas + ' perguntas</b> com explicação depois de cada resposta</li>' +
+      '<li><b>' + m.especiais.length + ' desafios</b> no fim (' + m.especiais.map(e => nomes[e.k]).join(', ') + ')</li></ol>' +
+    '<p class="small muted">Precisas de 70% para abrir o mundo seguinte. Podes sair quando quiseres: continuas no mesmo passo.</p>' +
+    '<button class="btn primary big" id="mi-go" type="button">' + (jaJogou ? 'Jogar com a matéria' : 'Começar') + '</button>' +
+    (jaJogou ? '<button class="btn ghost" id="mi-so" type="button">Já sei a matéria: só perguntas</button>' : '') + '</article></div>';
+  $('#sair').onclick = inicio;
+  $('#mi-go').onclick = () => jogarMundo(n, false);
+  const so = $('#mi-so'); if (so) so.onclick = () => jogarMundo(n, true);
+}
+
+/* Uma parte de matéria, dentro do mundo (o fundo fica mais discreto para ler) */
+function telaParte(ctx, p, seguinte, done){
+  const L = C.licoes[p.n], s = L.seccoes[p.i];
+  document.body.classList.add('foco');
+  ctx.setMateria(0);
+  const perguntas = seguinte && seguinte.k === 'q';
+  ctx.body.innerHTML = '<article class="mini pop-in parte"><p class="tag">Matéria · parte ' + p.parte + ' de ' + p.de + '</p>' +
+    (p.parte === 1 ? '<p class="li-ideia">' + L.ideia + '</p>' : '') + '<div class="licao">' + htmlSeccao(s) + '</div>' +
+    (p.parte === p.de ? '<p class="li-truque"><b>Truque:</b> ' + L.truque + '</p>' : '') +
+    '<button class="btn primary big" id="pt-ok" type="button">' + (perguntas ? 'Percebi: perguntas sobre isto' : 'Continuar') + '</button></article>';
+  $('#pt-ok').onclick = () => { ctx.setMateria(p.n); done(); };
 }
 
 function fimMundo(n, r){
@@ -2091,13 +2218,16 @@ function telaDesenvolvimento(ctx, dev, st, gravar, done, grupo, cot, extensa){
    ===================================================================== */
 function htmlLicao(n){
   const L = C.licoes[n]; if (!L) return '';
-  const tabela = t => '<p class="li-sub">' + esc(t.titulo) + '</p><div class="li-tabwrap"><table class="li-tab"><thead><tr>' + t.cab.map(c => '<th>' + esc(c) + '</th>').join('') + '</tr></thead><tbody>' +
-    t.linhas.map(l => '<tr>' + l.map((c, i) => '<td class="' + (c === '✓' || c === 'SIM' ? 'sim' : (c === '✗' || /^NÃO/.test(c)) ? 'nao' : '') + '">' + esc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
-  return '<div class="licao"><p class="li-ideia">' + L.ideia + '</p>' +
-    L.seccoes.map(s => '<section class="li-sec"><h3>' + esc(s.t) + '</h3>' +
-      (s.l.length ? '<dl>' + s.l.map(r => '<div class="li-row"><dt>' + esc(r[0]) + '</dt><dd>' + r[1] + '</dd></div>').join('') + '</dl>' : '') +
-      (s.tabela ? tabela(s.tabela) : '') + (s.fig ? htmlFig(s.fig, 'nomes') : '') + (s.quiz ? htmlQuiz(s.quiz) : '') + '</section>').join('') +
+  return '<div class="licao"><p class="li-ideia">' + L.ideia + '</p>' + L.seccoes.map(htmlSeccao).join('') +
     '<p class="li-truque"><b>Truque:</b> ' + L.truque + '</p></div>';
+}
+/* Uma secção da lição (usada na matéria toda e nas partes dentro dos mundos) */
+function htmlSeccao(s){
+  const tabela = t => '<p class="li-sub">' + esc(t.titulo) + '</p><div class="li-tabwrap"><table class="li-tab"><thead><tr>' + t.cab.map(c => '<th>' + esc(c) + '</th>').join('') + '</tr></thead><tbody>' +
+    t.linhas.map(l => '<tr>' + l.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+  return '<section class="li-sec"><h3>' + esc(s.t) + '</h3>' +
+    (s.l.length ? '<dl>' + s.l.map(r => '<div class="li-row"><dt>' + esc(r[0]) + '</dt><dd>' + r[1] + '</dd></div>').join('') + '</dl>' : '') +
+    (s.tabela ? tabela(s.tabela) : '') + (s.fig ? htmlFig(s.fig, 'nomes') : '') + (s.quiz ? htmlQuiz(s.quiz) : '') + '</section>';
 }
 /* Minijogo dentro da lição: um caso de cada vez, com explicação (os cliques tratam-se em baixo) */
 function htmlQuiz(key, ordem, k, certas){
@@ -2139,27 +2269,12 @@ function abrirMateria(n){
 function fecharMateria(){ const el = $('#sheet'); if (el) el.remove(); document.documentElement.classList.remove('sem-scroll'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMateria(); });
 
-/* Ecrã da lição no início de cada mundo */
-function telaLicao(n, comecar){
-  limpar(); topo();
-  const m = C.mundos[n - 1], jaJogou = !!S.mundos[n];
-  $app.innerHTML = '<div class="wrap" style="gap:14px"><header class="playbar"><button class="icon-btn" id="sair" type="button" aria-label="Sair para o início">✕</button>' +
-    '<div class="pb-mid"><p class="pb-title">Mundo ' + n + ' · Aprende primeiro</p><div class="bar"><i style="width:0"></i></div></div><span></span><span></span></header>' +
-    (jaJogou ? '<button class="btn ghost" id="li-saltar" type="button">Já sei a matéria: saltar para as perguntas</button>' : '') +
-    '<article class="mini pop-in"><p class="tag">Mundo ' + n + ' · Lição</p><h2 class="qtext">' + esc(m.titulo) + '</h2>' + htmlLicao(n) +
-    '<p class="lead small">Durante as perguntas podes voltar a ler isto no botão “Matéria”, lá em cima.</p>' +
-    '<button class="btn primary big" id="li-go" type="button">Já li: começar as perguntas</button></article></div>';
-  $('#sair').onclick = inicio;
-  $('#li-go').onclick = comecar;
-  const s = $('#li-saltar'); if (s) s.onclick = comecar;
-}
-
-/* Secção "Aprender a matéria": as 5 lições, pela ordem dos mundos */
+/* Secção "Matéria toda": as lições completas, pela ordem dos mundos (para ler ou rever de seguida) */
 function materia(n){
   limpar(); topo(); n = n || 1;
   const m = C.mundos[n - 1];
   $app.innerHTML = '<div class="wrap" style="gap:14px"><header class="playbar"><button class="icon-btn" id="sair" type="button" aria-label="Sair para o início">✕</button>' +
-    '<div class="pb-mid"><p class="pb-title">Aprender a matéria</p><div class="bar"><i style="width:' + (n / NM * 100) + '%"></i></div></div><span></span><span class="pb-right">' + n + '/' + NM + '</span></header>' +
+    '<div class="pb-mid"><p class="pb-title">Matéria toda</p><div class="bar"><i style="width:' + (n / NM * 100) + '%"></i></div></div><span></span><span class="pb-right">' + n + '/' + NM + '</span></header>' +
     '<div class="filtros">' + C.mundos.map(x => '<button class="mini-b' + (x.n === n ? ' on' : '') + '" data-n="' + x.n + '" type="button" aria-pressed="' + (x.n === n) + '"><span class="gr">' + x.letra + '</span> ' + esc(x.curto) + '</button>').join('') + '</div>' +
     '<article class="mini pop-in"><p class="tag">Mundo ' + n + '</p><h2 class="qtext">' + esc(m.titulo) + '</h2>' + htmlLicao(n) +
     '<div class="acts"><button class="btn" id="mt-cart" type="button">Cartões deste tema</button>' +
@@ -2168,7 +2283,7 @@ function materia(n){
   $('#sair').onclick = inicio;
   $app.querySelectorAll('[data-n]').forEach(b => b.onclick = () => materia(+b.dataset.n));
   $('#mt-cart').onclick = () => cartoes('m' + n);
-  const j = $('#mt-jogar'); if (j) j.onclick = () => jogarMundo(n, true);
+  const j = $('#mt-jogar'); if (j) j.onclick = () => jogarMundo(n);
   const p = $('#mt-prox'); if (p) p.onclick = () => materia(n + 1);
 }
 
@@ -2257,10 +2372,11 @@ function confetis(){
 }
 
 /* =====================================================================
-   SOM "SQUISH" (Web Audio, sem ficheiros) — desligado por defeito
+   SONS ASMR (Web Audio, sem ficheiros) — desligados por defeito
+   Bolhas suaves ao acertar, «ploc» baixinho ao errar, harpa ao subir de nível,
+   «pop» ao rebentar bolhas, toque leve nos botões e, se quiseres, o som das ondas.
    ===================================================================== */
-// Os sons ficam entre 300 e 3000 Hz: é o que os altifalantes dos telemóveis conseguem tocar
-// (sons muito graves, abaixo de ~250 Hz, quase não se ouvem num telemóvel).
+// Os sons ficam entre 300 e 3000 Hz: é o que os altifalantes dos telemóveis conseguem tocar.
 let AC = null;
 function audio(){
   if (!AC){ const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; AC = new A(); }
@@ -2268,169 +2384,160 @@ function audio(){
   return AC;
 }
 // iPhone/Android: o som só arranca depois de um toque, por isso "acorda-se" o áudio no primeiro toque
-document.addEventListener('pointerdown', () => { if (S.def.som) try { audio(); } catch(e){} }, { passive:true, capture:true });
+document.addEventListener('pointerdown', e => {
+  if (!S.def.som) return;
+  try { audio(); marAmbiente(); } catch(err){}
+  const b = e.target.closest && e.target.closest('.opt, .seg-b, .lk, .peca, .slot-b, .sp-b, .mini-b, .leg select');
+  if (b && !b.disabled) tocar('tique');
+}, { passive:true, capture:true });
 
 /* Desenha um som num contexto de áudio (também serve para o testar sem colunas, com OfflineAudioContext) */
 function desenharSom(ac, dest, t, tipo){
-  const out = ac.createGain(); out.gain.value = 0.9; out.connect(dest);
+  const out = ac.createGain(); out.gain.value = 0.85; out.connect(dest);
   const tom = (atraso, f0, f1, dur, vol, forma) => {
     const o = ac.createOscillator(), g = ac.createGain(), t0 = t + atraso;
     o.type = forma || 'sine';
     o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + dur + 0.03);
   };
-  const ruido = (f0, f1, dur, vol) => { // parte "molhada" do squish: ruído filtrado que fecha
+  const ruido = (f0, f1, dur, vol) => { // água: ruído filtrado muito curto
     const len = Math.floor(ac.sampleRate * dur), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
     const n = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
-    n.buffer = buf; f.type = 'bandpass'; f.Q.value = 1.4;
+    n.buffer = buf; f.type = 'bandpass'; f.Q.value = 2;
     f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.value = vol; n.connect(f); f.connect(g); g.connect(out); n.start(t);
   };
-  if (tipo === 'certo'){ // squish + brilho a subir
-    ruido(2600, 700, 0.16, 0.45); tom(0, 640, 220, 0.2, 0.32);
-    tom(0.09, 880, 1320, 0.14, 0.16);
-  } else if (tipo === 'errado'){ // "blop" suave a descer, nada agressivo
-    tom(0, 392, 262, 0.22, 0.26, 'triangle'); tom(0.05, 330, 220, 0.2, 0.12);
-  } else if (tipo === 'nivel'){ // pequeno arpejo
-    [523, 659, 784, 1047].forEach((f, i) => tom(i * 0.09, f, f * 1.01, 0.22, 0.2, 'triangle'));
-  } else { // toque numa bolha
-    ruido(2200, 520, 0.15, 0.45); tom(0, 560, 190, 0.18, 0.3);
+  if (tipo === 'certo'){ // duas bolhas a subir
+    tom(0, 480, 820, 0.09, 0.22); tom(0.08, 660, 1250, 0.12, 0.17); ruido(2400, 1600, 0.05, 0.1);
+  } else if (tipo === 'errado'){ // «ploc» grave e suave
+    tom(0, 320, 210, 0.26, 0.2); tom(0.03, 250, 190, 0.22, 0.07, 'triangle');
+  } else if (tipo === 'nivel'){ // harpa
+    [523, 659, 784, 1047, 1319].forEach((f, i) => tom(i * 0.1, f, f * 1.002, 0.55, 0.14, 'triangle'));
+  } else if (tipo === 'tique'){ // toque leve num botão
+    tom(0, 1700, 1300, 0.03, 0.06, 'triangle');
+  } else { // «pop» de uma bolha
+    tom(0, 360, 1500, 0.06, 0.3); ruido(3600, 1800, 0.03, 0.16);
   }
 }
 function tocar(tipo){
   if (!S.def.som) return;
   try { const ac = audio(); if (ac) desenharSom(ac, ac.destination, ac.currentTime + 0.01, tipo); } catch(e){}
 }
-function somSquish(){ tocar('squish'); }
+function somSquish(){ tocar('pop'); }
+function vibrar(ms){ if (S.def.vibrar && navigator.vibrate) try { navigator.vibrate(ms); } catch(e){} }
+
+/* Som das ondas: ruído suave que sobe e desce devagar, como o mar a chegar à praia */
+let MAR = null;
+function marAmbiente(){
+  const quer = S.def.som && S.def.mar && !document.hidden;
+  if (!quer){
+    if (MAR && AC){ const m = MAR; MAR = null; try { m.out.gain.setTargetAtTime(0, AC.currentTime, 0.4); } catch(e){} setTimeout(() => { try { m.src.stop(); m.lfo.stop(); m.lfo2.stop(); } catch(e){} }, 2000); }
+    return;
+  }
+  if (MAR) return;
+  const ac = audio(); if (!ac || ac.state !== 'running') return; // espera pelo primeiro toque
+  const len = ac.sampleRate * 6, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+  let b = 0;
+  for (let i = 0; i < len; i++){ const w = Math.random() * 2 - 1; b = (b + 0.03 * w) / 1.03; d[i] = b * 2.5 + w * 0.12; }
+  const src = ac.createBufferSource(), bp = ac.createBiquadFilter(), lp = ac.createBiquadFilter(), g = ac.createGain(), out = ac.createGain();
+  src.buffer = buf; src.loop = true;
+  bp.type = 'bandpass'; bp.frequency.value = 800; bp.Q.value = 0.5;
+  lp.type = 'lowpass'; lp.frequency.value = 2400;
+  g.gain.value = 0.1; out.gain.value = 0;
+  const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 0.09; lg.gain.value = 0.08; lfo.connect(lg); lg.connect(g.gain);
+  const lfo2 = ac.createOscillator(), lg2 = ac.createGain(); lfo2.frequency.value = 0.13; lg2.gain.value = 300; lfo2.connect(lg2); lg2.connect(bp.frequency);
+  src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(out); out.connect(ac.destination);
+  src.start(); lfo.start(); lfo2.start();
+  out.gain.setTargetAtTime(0.9, ac.currentTime, 1.2);
+  MAR = { src, lfo, lfo2, out };
+}
+document.addEventListener('visibilitychange', () => { try { marAmbiente(); } catch(e){} });
 
 /* =====================================================================
-   FUNDO ANIMADO (bolhas do mar) — metaballs num canvas de baixa resolução, ampliado
-   (cada blob = 2 bolas que se fundem, por isso a forma muda devagar)
+   FUNDO ASMR — ondas lentas no fundo do ecrã e bolhas que sobem devagar.
+   Toca numa bolha para a rebentar (som «pop» e vibração, se estiverem ligados).
+   Ao acertar, o mar ondula e sobem bolhas novas. Durante a matéria, o fundo fica mais discreto.
    ===================================================================== */
 const FUNDO = (() => {
-  const CORES = { agua:[150,214,230], turquesa:[120,222,206], azul:[150,190,240], espuma:[214,240,246], areia:[246,222,170], coral:[255,190,170] };
-  // [cor, x, y, raio relativo, é bolha "brilhante"?]
-  const SEMENTES = [
-    ['agua',.16,.12,.19], ['azul',.84,.2,.18], ['turquesa',.22,.52,.16], ['agua',.8,.6,.2],
-    ['areia',.48,.88,.17], ['espuma',.6,.36,.14,true], ['coral',.1,.88,.15], ['espuma',.92,.94,.13,true]
-  ];
-  let cv, g, sc, sg, img, W = 0, H = 0, R = 0, cell = 6, gw = 0, gh = 0;
-  let blobs = [], brilhos = [], bolas = [], raf = 0, last = 0, t = 0;
-  let reduz = false, pronto = false;
+  let cv, g, W = 0, H = 0, raf = 0, last = 0, t = 0, onda = 0, reduz = false, pronto = false, escuro = false;
+  let bolhas = [], pops = [];
   const rnd = (a, b) => a + Math.random() * (b - a);
+  const nova = y => ({ x:rnd(0, W), y:y == null ? rnd(0, H) : y, r:rnd(5, 20), v:rnd(9, 22), f:rnd(.5, 1.3), p:rnd(0, 6.28) });
+  const ONDAS = ['120,200,222', '70,165,196', '30,120,155'];
 
   function iniciar(){
     try {
       cv = document.createElement('canvas'); cv.id = 'fundo'; cv.setAttribute('aria-hidden', 'true');
       document.body.insertBefore(cv, document.body.firstChild);
-      g = cv.getContext('2d'); sc = document.createElement('canvas'); sg = sc.getContext('2d');
-      if (!g || !sg) return;
+      g = cv.getContext('2d'); if (!g) return;
     } catch(e){ return; }
-    blobs = SEMENTES.map(s => ({ c:CORES[s[0]], bx:s[1], by:s[2], rr:s[3], butter:!!s[4], a:s[4] ? 0.96 : 0.72,
-      ax:rnd(.05,.09), ay:rnd(.04,.07), v1:rnd(.07,.14), v2:rnd(.06,.12), v3:rnd(.18,.32), p:rnd(0, 6.28), sq:0, sv:0 }));
-    brilhos = Array.from({ length:14 }, (_, i) => ({ x:Math.random(), y:Math.random(), s:rnd(3, 7), v:rnd(.4, .9), p:rnd(0, 6.28), c:['255,255,255','255,222,150','226,206,255'][i % 3] }));
-    t = rnd(0, 100);
     try {
       const mq = matchMedia('(prefers-reduced-motion: reduce)'); reduz = mq.matches;
-      const muda = e => { reduz = e.matches; aplicar(); };
-      if (mq.addEventListener) mq.addEventListener('change', muda); else if (mq.addListener) mq.addListener(muda);
+      const md = matchMedia('(prefers-color-scheme: dark)'); escuro = md.matches;
+      const muda = () => { reduz = mq.matches; escuro = md.matches; aplicar(); };
+      [mq, md].forEach(q => { if (q.addEventListener) q.addEventListener('change', muda); else if (q.addListener) q.addListener(muda); });
     } catch(e){}
     addEventListener('resize', medir);
     document.addEventListener('visibilitychange', aplicar);
     document.addEventListener('pointerdown', toque, { passive:true });
-    pronto = true; medir(); aplicar();
+    pronto = true; medir();
+    bolhas = Array.from({ length:16 }, () => nova());
+    aplicar();
   }
 
   function medir(){
     if (!pronto) return;
-    W = innerWidth; H = innerHeight; R = Math.sqrt(W * H);
+    W = innerWidth; H = innerHeight;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cell = Math.max(6, Math.ceil(Math.max(W, H) / 200));
-    gw = Math.ceil(W / cell) + 1; gh = Math.ceil(H / cell) + 1;
-    sc.width = gw; sc.height = gh; img = sg.createImageData(gw, gh);
+    bolhas.forEach(b => { if (b.x > W) b.x = rnd(0, W); });
     if (S.def.fundo) desenhar();
-  }
-
-  function posicoes(){
-    bolas = [];
-    blobs.forEach(b => {
-      const x = (b.bx + Math.sin(t * b.v1 + b.p) * b.ax) * W, y = (b.by + Math.cos(t * b.v2 + b.p * 1.3) * b.ay) * H;
-      const r = b.rr * R, w = 1 + 0.07 * Math.sin(t * 0.5 + b.p), k = (1 + b.sq) * w;
-      b.x = x; b.y = y; b.r = r; b.sx = k; b.sy = 1 / k;
-      const ang = t * b.v3 + b.p, d = r * 0.55;
-      bolas.push({ x, y, r2:r * r, ix:1 / b.sx, iy:1 / b.sy, b });
-      bolas.push({ x:x + Math.cos(ang) * d * b.sx, y:y + Math.sin(ang) * d * b.sy, r2:r * r * 0.36, ix:1 / b.sx, iy:1 / b.sy, b });
-    });
-  }
-
-  function campoEm(px, py){
-    let s = 0, melhor = null, fm = 0;
-    for (const q of bolas){ const dx = (px - q.x) * q.ix, dy = (py - q.y) * q.iy, f = q.r2 / (dx * dx + dy * dy + 1); s += f; if (f > fm){ fm = f; melhor = q.b; } }
-    return { s, melhor };
-  }
-
-  function campo(){
-    const d = img.data, n = bolas.length; let i = 0;
-    for (let gy = 0; gy < gh; gy++){
-      const py = gy * cell;
-      for (let gx = 0; gx < gw; gx++, i += 4){
-        const px = gx * cell; let s = 0, r = 0, gg = 0, bb = 0, a = 0;
-        for (let k = 0; k < n; k++){
-          const q = bolas[k], dx = (px - q.x) * q.ix, dy = (py - q.y) * q.iy, f = q.r2 / (dx * dx + dy * dy + 1), c = q.b.c;
-          s += f; r += f * c[0]; gg += f * c[1]; bb += f * c[2]; a += f * q.b.a;
-        }
-        if (s < 0.72){ d[i + 3] = 0; continue; }
-        const inv = 1 / s, e0 = s >= 1.04 ? 1 : (s - 0.72) / 0.32, e = e0 * e0 * (3 - 2 * e0);
-        const luz = Math.min(0.25, Math.max(0, (s - 1) * 0.05)); // centro mais claro = aspeto cremoso
-        r *= inv; gg *= inv; bb *= inv;
-        d[i] = r + (255 - r) * luz; d[i + 1] = gg + (255 - gg) * luz; d[i + 2] = bb + (255 - bb) * luz;
-        d[i + 3] = e * a * inv * 255;
-      }
-    }
-    sg.putImageData(img, 0, 0);
-  }
-
-  function estrela(x, y, s, a, c){
-    g.fillStyle = 'rgba(' + c + ',' + a + ')';
-    g.beginPath(); g.moveTo(x, y - s);
-    g.quadraticCurveTo(x, y, x + s, y); g.quadraticCurveTo(x, y, x, y + s);
-    g.quadraticCurveTo(x, y, x - s, y); g.quadraticCurveTo(x, y, x, y - s); g.fill();
   }
 
   function desenhar(){
     if (!pronto || !W) return;
-    posicoes(); campo();
     g.clearRect(0, 0, W, H);
-    g.imageSmoothingEnabled = true;
-    g.drawImage(sc, 0, 0, gw * cell, gh * cell);
-    // brilho suave por cima de cada blob (mais forte nas bolhas brilhantes)
-    blobs.forEach(b => {
-      g.save(); g.translate(b.x - b.r * 0.28 * b.sx, b.y - b.r * 0.4 * b.sy); g.scale(b.sx * 1.3, b.sy * 0.8);
-      const hr = b.r * 0.5, rg = g.createRadialGradient(0, 0, 0, 0, 0, hr);
-      rg.addColorStop(0, 'rgba(255,255,255,' + (b.butter ? 0.8 : 0.5) + ')'); rg.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = rg; g.beginPath(); g.arc(0, 0, hr, 0, 6.2832); g.fill();
-      g.fillStyle = 'rgba(255,255,255,' + (b.butter ? 0.85 : 0.6) + ')';
-      g.beginPath(); g.ellipse(-hr * 0.15, -hr * 0.1, hr * 0.16, hr * 0.09, -0.5, 0, 6.2832); g.fill();
-      g.restore();
+    // três camadas de ondas, lentas, no fundo do ecrã
+    for (let k = 0; k < 3; k++){
+      const amp = (8 + k * 4) * (1 + onda * 1.5), y0 = H * (0.82 + k * 0.055);
+      g.beginPath(); g.moveTo(0, H);
+      for (let x = 0; x <= W + 12; x += 12) g.lineTo(x, y0 + Math.sin(x * 0.011 + t * (0.45 + k * 0.17) + k * 1.7) * amp + Math.sin(x * 0.025 - t * 0.3 + k) * amp * 0.4);
+      g.lineTo(W, H); g.closePath();
+      g.fillStyle = 'rgba(' + ONDAS[k] + ',' + ((escuro ? 0.16 : 0.11) + k * 0.08) + ')'; g.fill();
+    }
+    // bolhas
+    const traco = escuro ? '220,245,255' : '40,130,160';
+    bolhas.forEach(b => {
+      const x = b.x + Math.sin(t * b.f + b.p) * 7, y = b.y;
+      const rg = g.createRadialGradient(x - b.r * .3, y - b.r * .3, b.r * .1, x, y, b.r);
+      rg.addColorStop(0, 'rgba(255,255,255,0.05)'); rg.addColorStop(.8, 'rgba(' + traco + ',0.08)'); rg.addColorStop(1, 'rgba(' + traco + ',0.22)');
+      g.fillStyle = rg; g.beginPath(); g.arc(x, y, b.r, 0, 6.2832); g.fill();
+      g.strokeStyle = 'rgba(' + traco + ',0.45)'; g.lineWidth = 1.2; g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.ellipse(x - b.r * .38, y - b.r * .42, b.r * .2, b.r * .11, -0.7, 0, 6.2832); g.fill();
     });
-    // glitter que pisca devagar
-    brilhos.forEach(s => {
-      const v = Math.sin(t * s.v + s.p); if (v <= 0.3) return;
-      const a = Math.pow((v - 0.3) / 0.7, 3) * 0.9;
-      estrela(s.x * W, s.y * H, s.s * (0.6 + 0.4 * a), a, s.c);
+    // bolhas a rebentar: anel que alarga e gotinhas
+    pops.forEach(p => {
+      const k = Math.min(1, (t - p.t) / 0.45), a = 1 - k;
+      g.strokeStyle = 'rgba(' + traco + ',' + (0.6 * a) + ')'; g.lineWidth = 2 * a + .5;
+      g.beginPath(); g.arc(p.x, p.y, p.r * (1 + k * 1.4), 0, 6.2832); g.stroke();
+      g.fillStyle = 'rgba(' + traco + ',' + (0.7 * a) + ')';
+      for (let i = 0; i < 7; i++){ const an = i / 7 * 6.2832 + p.r; g.beginPath(); g.arc(p.x + Math.cos(an) * p.r * (1 + k * 2.2), p.y + Math.sin(an) * p.r * (1 + k * 2.2), 2.2 * a + .3, 0, 6.2832); g.fill(); }
     });
   }
 
   function frame(ts){
     raf = requestAnimationFrame(frame);
     if (!last){ last = ts; return; }
-    if (ts - last < 40) return; // ~25 fps chega para movimento lento e poupa bateria
+    if (ts - last < 33) return; // ~30 fps chega para movimento lento e poupa bateria
     const dt = Math.min(0.06, (ts - last) / 1000); last = ts; t += dt;
-    // mola amortecida: achata, estica e volta com efeito gelatina
-    blobs.forEach(b => { const ac = -70 * b.sq - 5 * b.sv; b.sv += ac * dt; b.sq += b.sv * dt; });
+    onda *= Math.pow(0.3, dt);
+    for (let i = bolhas.length - 1; i >= 0; i--){
+      const b = bolhas[i]; b.y -= b.v * dt * (1 + onda);
+      if (b.y < -30){ if (b.extra) bolhas.splice(i, 1); else bolhas[i] = nova(H + 30); }
+    }
+    pops = pops.filter(p => t - p.t < 0.45);
     desenhar();
   }
   function parar(){ if (raf) cancelAnimationFrame(raf); raf = 0; last = 0; }
@@ -2441,22 +2548,25 @@ const FUNDO = (() => {
     document.body.classList.toggle('com-fundo', on);
     cv.hidden = !on;
     if (on && !reduz && !document.hidden){ if (!raf) raf = requestAnimationFrame(frame); }
-    else { parar(); if (on){ blobs.forEach(b => { b.sq = 0; b.sv = 0; }); desenhar(); } }
+    else { parar(); if (on) desenhar(); }
   }
 
-  function squish(b, forca){
-    if (!raf) return; // fundo parado (desligado ou movimento reduzido)
-    b.sq = forca; b.sv = 0;
-  }
+  // Ao acertar: o mar ondula e sobem umas bolhas mais rápidas
   function squishTodos(){
     if (!pronto || !raf) return;
-    blobs.forEach(b => squish(b, 0.26));
+    onda = 1;
+    for (let i = 0; i < 6; i++) bolhas.push(Object.assign(nova(H + rnd(10, 90)), { r:rnd(4, 10), v:rnd(70, 120), extra:true }));
   }
   function toque(e){
     if (!raf || !e.target || !e.target.closest) return;
-    if (e.target.closest('button, a, input, select, textarea, .q, .mini, .res, .player, .mundo, .acao, .sp-card, .face, .playbar, .hero, .rodape, .aviso, .sheet, .confirma')) return;
-    const r = campoEm(e.clientX, e.clientY);
-    if (r.s > 0.9 && r.melhor){ squish(r.melhor, 0.42); somSquish(); }
+    if (e.target.closest('button, a, input, select, textarea, label, .q, .mini, .res, .player, .mundo, .acao, .sp-card, .face, .playbar, .hero, .rodape, .aviso, .sheet, .confirma, .plano, .dobra, .continuar')) return;
+    let alvo = -1, melhor = 1e9;
+    bolhas.forEach((b, i) => { const x = b.x + Math.sin(t * b.f + b.p) * 7, d = Math.hypot(e.clientX - x, e.clientY - b.y); if (d < b.r + 18 && d < melhor){ melhor = d; alvo = i; } });
+    if (alvo < 0) return;
+    const b = bolhas[alvo];
+    pops.push({ x:b.x + Math.sin(t * b.f + b.p) * 7, y:b.y, r:b.r, t });
+    if (b.extra) bolhas.splice(alvo, 1); else bolhas[alvo] = nova(H + 30);
+    somSquish(); vibrar(8);
   }
 
   return { iniciar, aplicar, squishTodos };

@@ -103,6 +103,14 @@ for (const m of C.mundos) {
 }
 ok(/[Pp]p?\. 24\d/.test(C.licoes[1].ideia) && /pp\. 272–281/.test(C.licoes[7].ideia), 'lições indicam as páginas do manual');
 
+console.log('— Matéria aos bocadinhos dentro dos mundos —');
+ok(P.every((p) => Number.isInteger(p.s) && C.licoes[p.m].seccoes[p.s] && !C.licoes[p.m].seccoes[p.s].quiz), 'cada pergunta indica a secção da lição (s) onde a matéria é explicada');
+for (const m of C.mundos) {
+  const partes = C.licoes[m.n].seccoes.map((s, i) => ({ s, i })).filter((x) => !x.s.quiz);
+  const semPerg = partes.filter((x) => x.s.l.length && !P.some((p) => p.m === m.n && p.s === x.i));
+  ok(partes.length >= 3 && !semPerg.length && partes.length <= 6, `mundo ${m.n}: ${partes.length} partes de matéria, todas com perguntas a seguir`);
+}
+
 console.log('— Português de Portugal —');
 const brasil = /\b(ônibus|time de|tela\b|celular|equipe\b|registrar|usuário|arquivo|você)\b/i;
 ok(!brasil.test(texto), 'sem palavras do português do Brasil');

@@ -7,12 +7,15 @@ Site: https://bcryptopinheiro.github.io/rota-do-mar/
 
 ## O que tem
 
-- **Aprender a matéria**: a matéria dos 7 mundos explicada, com mapas e esquemas legendados, tabelas, exemplos e truques. Cada mundo abre com a sua lição antes das perguntas, e o botão «Matéria» deixa revê-la a meio do jogo
-- 7 mundos que se desbloqueiam com 70%, com 1 a 3 estrelas, XP e níveis
+- **Botão «Continuar»** no topo: leva sempre ao próximo passo certo (o jogo a meio, o mundo seguinte, a simulação ou a revisão dos erros)
+- **Plano até ao teste**: o aluno indica a data do teste e o jogo diz o que fazer hoje (e que na véspera é a Simulação e a revisão dos erros)
+- 7 mundos que se desbloqueiam com 70%, com tempo estimado, 1 a 3 estrelas, XP e níveis. **A matéria vem aos bocadinhos**: uma parte curta, perguntas só sobre essa parte, a parte seguinte… e os desafios no fim. Ao repetir um mundo, pode-se escolher «só perguntas». O botão «Matéria» deixa rever a lição toda a meio do jogo
+- **Matéria toda**: as lições completas de cada tema, para ler ou rever de seguida, com mapas e esquemas legendados, tabelas, exemplos e truques
 - Minijogos: escolha múltipla (algumas com gráficos, textos e mapas, como no teste), verdadeiro ou falso, completa a frase, classifica rápido (60 s), legenda o mapa ou esquema, ordena, liga
 - Cartões de estudo por tema (com respostas abertas para as aprendizagens da ficha da professora), revisão dos erros e teste final de 0 a 20
 - **Simulação do Teste** no formato da ficha da professora: Grupo I escolha múltipla com documentos, II verdadeiro ou falso, III completamento, IV associação e ordenação, V legendar um mapa ou esquema, VI respostas curtas/restritas e VII resposta extensa (as respostas escritas corrigem-se com resposta-modelo e checklist)
-- Fundo animado de bolhas do mar (pode ser desligado nas definições) e som opcional
+- **Modo relaxar (ASMR)**: fundo com ondas lentas e bolhas que sobem (toca numa bolha para a rebentar), som das ondas, sons suaves de bolhas ao acertar e ao tocar nos botões, e vibração leve (Android). Durante as partes de matéria o fundo fica mais discreto. Tudo opcional nas definições
+- Ecrã inicial arrumado: minijogos, «O que sai no teste», definições e recomeçar ficam em secções que abrem (e o jogo lembra-se das que deixaste abertas)
 
 ## Guardar e recomeçar
 
@@ -45,13 +48,13 @@ Outros ficheiros:
 No objeto `CONTEUDO.perguntas`, a primeira opção de `o` é sempre a certa (o jogo baralha as opções):
 
 ```js
-{ id:'m5-50', m:5, t:'mc', q:'Pergunta', o:['CERTA','errada','errada','errada'], e:'Explicação' }
-{ id:'m5-51', m:5, t:'vf', q:'Afirmação', a:true, e:'Explicação' }
-{ id:'m5-52', m:5, t:'completa', q:'Frase com ___ no sítio da palavra', o:['CERTA','errada','errada','errada'], e:'...' }
-{ id:'m5-53', m:5, t:'mc', doc:'especies2019', q:'Segundo o documento…', o:[...], e:'...' }
+{ id:'m5-50', m:5, s:2, t:'mc', q:'Pergunta', o:['CERTA','errada','errada','errada'], e:'Explicação' }
+{ id:'m5-51', m:5, s:2, t:'vf', q:'Afirmação', a:true, e:'Explicação' }
+{ id:'m5-52', m:5, s:2, t:'completa', q:'Frase com ___ no sítio da palavra', o:['CERTA','errada','errada','errada'], e:'...' }
+{ id:'m5-53', m:5, s:1, t:'mc', doc:'especies2019', q:'Segundo o documento…', o:[...], e:'...' }
 ```
 
-`m` é o número do mundo (1–7), o `id` começa por `m` + esse número e tem de ser único. `doc` mostra um gráfico, texto ou mapa por cima da pergunta (de `CONTEUDO.documentos` ou `CONTEUDO.figuras`). Com `destaque:true`, a pergunta conta para o mínimo de perguntas essenciais do teste final.
+`m` é o número do mundo (1–7) e `s` é a secção da lição desse mundo onde a matéria é explicada (começa em 0; a pergunta só aparece depois dessa parte). O `id` começa por `m` + esse número e tem de ser único. `doc` mostra um gráfico, texto ou mapa por cima da pergunta (de `CONTEUDO.documentos` ou `CONTEUDO.figuras`). Com `destaque:true`, a pergunta conta para o mínimo de perguntas essenciais do teste final.
 
 ## Antes de publicar uma alteração
 
