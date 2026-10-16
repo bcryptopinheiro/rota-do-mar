@@ -10,6 +10,9 @@ Site: https://bcryptopinheiro.github.io/rota-do-mar/
 - **Botão «Continuar»** no topo: leva sempre ao próximo passo certo (o jogo a meio, o mundo seguinte, a simulação ou a revisão dos erros)
 - **Plano até ao teste**: o aluno indica a data do teste e o jogo diz o que fazer hoje (e que na véspera é a Simulação e a revisão dos erros)
 - 7 mundos que se desbloqueiam com 70%, com tempo estimado, 1 a 3 estrelas, XP e níveis. **A matéria vem aos bocadinhos**: uma parte curta, perguntas só sobre essa parte, a parte seguinte… e os desafios no fim. Ao repetir um mundo, pode-se escolher «só perguntas». O botão «Matéria» deixa rever a lição toda a meio do jogo
+- **Respostas escritas dentro dos mundos** («Explica», «Justifica», «Com base no documento…»), logo a seguir à parte de matéria a que dizem respeito: o aluno escreve (fica guardado), compara com a resposta-modelo e marca os pontos que incluiu
+- **Perguntas de documentos com dados**: ler valores, comparar e fazer contas simples com gráficos (diferenças, «quantas vezes mais», percentagens)
+- **Opções equilibradas**: as respostas erradas são plausíveis e do mesmo tamanho que a certa, para o tamanho não denunciar a resposta (o `verificar.mjs` controla isto)
 - **Matéria toda**: as lições completas de cada tema, para ler ou rever de seguida, com mapas e esquemas legendados, tabelas, exemplos e truques
 - Minijogos: escolha múltipla (algumas com gráficos, textos e mapas, como no teste), verdadeiro ou falso, completa a frase, classifica rápido (60 s), legenda o mapa ou esquema, ordena, liga
 - Cartões de estudo por tema (com respostas abertas para as aprendizagens da ficha da professora), revisão dos erros e teste final de 0 a 20

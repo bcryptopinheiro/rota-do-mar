@@ -111,6 +111,22 @@ for (const m of C.mundos) {
   ok(partes.length >= 3 && !semPerg.length && partes.length <= 6, `mundo ${m.n}: ${partes.length} partes de matéria, todas com perguntas a seguir`);
 }
 
+console.log('— Respostas escritas dentro dos mundos —');
+const E = C.escritas;
+ok(new Set(E.map((e) => e.id)).size === E.length, `ids únicos (${E.length} respostas escritas)`);
+for (const m of C.mundos) {
+  const es = E.filter((e) => e.m === m.n);
+  ok(es.length >= 2 && es.every((e) => C.licoes[m.n].seccoes[e.s] && !C.licoes[m.n].seccoes[e.s].quiz && (!e.doc || C.documentos[e.doc] || C.figuras[e.doc]) && e.pontos.length >= 3 && e.modelo.length > 200),
+    `mundo ${m.n}: ${es.length} respostas escritas com secção, documento, 3 pontos e resposta-modelo`);
+}
+ok(E.filter((e) => e.doc).length >= 8, `respostas escritas com documento (${E.filter((e) => e.doc).length}), como no teste`);
+
+console.log('— Opções equilibradas (a certa não pode ser sempre a mais comprida) —');
+const mcs = P.filter((p) => p.t !== 'vf');
+const longa = mcs.filter((p) => { const L = p.o.map((s) => s.length), mx = Math.max(...L); return L[0] === mx && L.filter((l) => l === mx).length === 1; }).length;
+ok(longa / mcs.length <= 0.35, `a certa é a mais comprida em ${Math.round(longa / mcs.length * 100)}% das perguntas (máximo 35%; por acaso seria ≈25%)`);
+ok(P.filter((p) => p.doc && /cerca de|vezes|soma|diferença|aproximadamente|em conjunto/i.test(p.q + p.o[0])).length >= 6, 'há perguntas que obrigam a ler e comparar valores dos documentos');
+
 console.log('— Português de Portugal —');
 const brasil = /\b(ônibus|time de|tela\b|celular|equipe\b|registrar|usuário|arquivo|você)\b/i;
 ok(!brasil.test(texto), 'sem palavras do português do Brasil');
