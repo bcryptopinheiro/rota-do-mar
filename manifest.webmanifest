@@ -1,0 +1,20 @@
+{
+  "name": "Rota do Mar — Geografia 11.º ano",
+  "short_name": "Rota do Mar",
+  "description": "Jogo para estudar Geografia: os recursos marítimos — litoral, zonas marítimas e ZEE, pesca, aquicultura, salicultura e gestão do litoral.",
+  "lang": "pt-PT",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#0A6C86",
+  "background_color": "#E8F2F4",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

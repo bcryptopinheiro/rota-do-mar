@@ -1,0 +1,15 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Node (só se usares ferramentas como npx serve / lighthouse)
+node_modules/
+npm-debug.log*
+
+# Relatórios de testes locais
+lighthouse*.html
+lighthouse*.json
