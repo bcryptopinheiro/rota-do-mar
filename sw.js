@@ -1,6 +1,6 @@
 /* Service worker da Rota do Mar: guarda o jogo no telemóvel para funcionar sem internet.
    PARA PUBLICAR UMA ATUALIZAÇÃO: muda o número da versão abaixo (v1 → v2 → v3...). */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = `rota-do-mar-${VERSION}`;
 const FONTS = 'rota-do-mar-fonts'; // fontes do Google (guardadas à parte, não mudam)
 

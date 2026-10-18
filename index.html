@@ -132,11 +132,11 @@ p{margin:0}
 .acts .btn{flex:1 1 180px}
 
 /* ---------- Ecrã de jogo ---------- */
-.playbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg); display:grid; grid-template-columns:auto 1fr auto auto; gap:10px; align-items:center; padding-block:10px}
+.playbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg); display:flex; gap:10px; align-items:center; padding-block:10px}
 body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
 .icon-btn{width:44px; height:44px; border-radius:50%; border:2px solid var(--line); background:var(--surface); font-size:18px; display:grid; place-items:center}
 .pb-title{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.pb-mid{min-width:0}
+.pb-mid{flex:1; min-width:0}
 .bar{height:10px; background:var(--surface); border:1px solid var(--line); border-radius:99px; overflow:hidden; margin-top:4px}
 .bar i{display:block; height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .35s ease}
 .pb-right{display:flex; flex-direction:column; align-items:flex-end; font-family:var(--f-mono); font-size:13px; font-variant-numeric:tabular-nums; min-width:52px}
@@ -310,6 +310,11 @@ html.sem-scroll{overflow:hidden}
 .lq-caso{font-size:17px; font-weight:700}
 .lq-ops{display:grid; grid-template-columns:1fr 1fr; gap:8px}
 @media (max-width:440px){ .lq-ops{grid-template-columns:1fr} }
+.respostas{width:100%; text-align:left}
+.respostas summary{cursor:pointer; font-weight:700; padding:12px 14px; border-radius:12px; background:var(--surface-2)}
+.respostas .revlist{margin-top:10px}
+.revitem.ok{border-color:var(--ok)}
+.revitem.mal{border-color:var(--bad)}
 /* ---------- Continuar e recomeçar ---------- */
 .mrow{display:grid; grid-template-columns:1fr auto; gap:8px}
 .reset-b{width:52px; border-radius:var(--r); border:2px solid var(--line); background:var(--surface); font-size:22px; color:var(--muted)}
@@ -1372,7 +1377,7 @@ const $app = $('#app');
 let TIMERS = [];
 let combo = 0;
 
-function limpar(){ TIMERS.forEach(clearInterval); TIMERS = []; fecharMateria(); document.body.classList.remove('foco'); }
+function limpar(){ TIMERS.forEach(clearInterval); TIMERS = []; fecharMateria(); document.body.classList.remove('foco'); VOLTAR = inicio; }
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function baralhar(a){ const b = a.slice(); for (let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 function sorte(a){ return a[Math.floor(Math.random() * a.length)]; }
@@ -1409,6 +1414,24 @@ function erro(id){
   if (id){ S.erros[id] = { s:0 }; guardar(); }
 }
 
+/* ---------- Botão «voltar» do telemóvel/browser ----------
+   Em vez de sair do jogo, recua: pergunta anterior, cartão anterior, matéria anterior ou início. */
+let VOLTAR = null, histArmado = false, ignorarPop = false;
+function armarVoltar(fn){
+  VOLTAR = fn;
+  if (!histArmado){ try { history.pushState({ dc:1 }, ''); histArmado = true; } catch(e){} }
+}
+function desarmarVoltar(){
+  VOLTAR = null;
+  if (histArmado){ histArmado = false; ignorarPop = true; try { history.back(); } catch(e){ ignorarPop = false; } }
+}
+addEventListener('popstate', () => {
+  if (ignorarPop){ ignorarPop = false; return; }
+  histArmado = false;
+  if (document.getElementById('sheet')){ fecharMateria(); if (VOLTAR) armarVoltar(VOLTAR); return; }
+  const f = VOLTAR; VOLTAR = null; if (f) f();
+});
+
 /* ---------- Estado dos mundos ---------- */
 function infoMundo(n){ return S.mundos[n] || { best:0, est:0 }; }
 function desbloqueado(n){ return n === 1 || S.abertos.indexOf(n) >= 0 || infoMundo(n - 1).best >= 0.7; }
@@ -1435,9 +1458,9 @@ function progOk(ch){
 }
 const serPasso = p => p.k === 'q' ? { k:'q', id:p.it.id } : p;
 const desPasso = p => p.k === 'q' ? { k:'q', it:ITENS[p.id] } : p;
-const serRes = x => x.Q ? { c:x.c, ok:x.ok, id:x.Q.id, esc:x.Q.opts[x.i].txt } : { c:x.c };
+const serRes = x => x.Q ? { c:x.c, ok:x.ok, id:x.Q.id, esc:x.Q.opts[x.i].txt } : x.texto != null ? { c:x.c, texto:x.texto, marcados:x.marcados } : { c:x.c };
 function desResposta(x){ const Q = preparar(ITENS[x.id]); return { ok:x.ok, Q, i:Math.max(0, Q.opts.findIndex(o => o.txt === x.esc)) }; }
-const desRes = (x, p) => x.id ? Object.assign({ p, c:x.c }, desResposta(x)) : { p, c:x.c };
+const desRes = (x, p) => x.id ? Object.assign({ p, c:x.c }, desResposta(x)) : Object.assign({ p }, x);
 let pedirReset = 0; // mundo cujo "Recomeçar?" está aberto no mapa
 function estrelas(p){ return p >= 0.95 ? 3 : p >= 0.85 ? 2 : p >= 0.7 ? 1 : 0; }
 
@@ -1508,7 +1531,7 @@ function htmlPlano(){
    ECRÃ INICIAL — primeiro o botão «Continuar»; o resto está arrumado em secções que abrem
    ===================================================================== */
 function inicio(){
-  limpar(); combo = 0; topo();
+  limpar(); desarmarVoltar(); combo = 0; topo();
   const pr = pedirReset; pedirReset = 0; // "Recomeçar o Mundo n?" só fica aberto até à próxima ação
   const nv = nivel(S.xp);
   const nErros = errosAtivos().length;
@@ -1611,17 +1634,23 @@ function inicio(){
 function palco(titulo, modo, chave, materiaN){
   limpar(); topo();
   $app.innerHTML = '<div class="wrap" style="gap:12px"><header class="playbar"><button class="icon-btn" id="sair" type="button" aria-label="Sair para o início">✕</button>' +
+    '<button class="icon-btn" id="pant" type="button" aria-label="Ver o passo anterior" title="Passo anterior" hidden>←</button>' +
     '<div class="pb-mid"><p class="pb-title">' + esc(titulo) + '</p><div class="bar"><i id="pbar"></i></div></div>' +
     '<button class="mat-b" id="pmat" type="button" hidden>Matéria</button>' +
     '<div class="pb-right"><span id="pcount"></span><span class="pb-combo" id="pcombo"></span></div></header><main class="stage" id="stage"></main></div>';
-  $('#sair').onclick = () => { const guardado = chave && S.prog[chave]; inicio(); if (guardado) toast('Fica guardado: continuas onde paraste.'); };
+  const sair = () => { const guardado = chave && S.prog[chave]; inicio(); if (guardado) toast('Fica guardado: continuas onde paraste.'); };
+  $('#sair').onclick = sair;
+  armarVoltar(sair);
   mostrarCombo();
   // "Matéria": rever a lição do tema sem sair do jogo (não aparece no teste nem na simulação)
-  let alvo = 0; const mb = $('#pmat');
+  let alvo = 0; const mb = $('#pmat'), pa = $('#pant');
   const setMateria = n => { alvo = n; mb.hidden = modo === 'teste' || !(n && C.licoes[n]); };
   mb.onclick = () => abrirMateria(alvo);
   setMateria(materiaN);
-  return { body:$('#stage'), modo:modo || 'normal', setMateria, prog(f, l){ $('#pbar').style.width = (f * 100) + '%'; $('#pcount').textContent = l || ''; } };
+  return { body:$('#stage'), modo:modo || 'normal', setMateria, sair,
+    setVoltar(fn){ armarVoltar(fn); },
+    setAnterior(mostrar, fn){ pa.hidden = !mostrar; pa.onclick = fn; },
+    prog(f, l){ $('#pbar').style.width = (f * 100) + '%'; $('#pcount').textContent = l || ''; } };
 }
 
 function preparar(it){
@@ -1634,19 +1663,22 @@ function preparar(it){
 }
 function fmtQ(q){ return esc(q).replace('___', '<span class="blank">______</span>'); }
 
-function telaPergunta(ctx, it, done){
-  const Q = preparar(it), teste = ctx.modo === 'teste';
+function telaPergunta(ctx, it, done, op){
+  op = op || {};
+  const Q = op.Q || preparar(it), teste = ctx.modo === 'teste';
   const letras = Q.t === 'vf' ? ['V','F'] : ['A','B','C','D'];
-  ctx.body.innerHTML = '<article class="q pop-in"><p class="tag">' + TIPOS[Q.t] + '</p>' + (it.doc ? htmlDoc(it.doc, false) : '') + '<h2 class="qtext' + (Q.q.length > 150 ? ' longa' : '') + '">' + fmtQ(Q.q) + '</h2>' +
+  ctx.body.innerHTML = '<article class="q pop-in"><p class="tag">' + (op.tag || TIPOS[Q.t]) + '</p>' + (it.doc ? htmlDoc(it.doc, false) : '') + '<h2 class="qtext' + (Q.q.length > 150 ? ' longa' : '') + '">' + fmtQ(Q.q) + '</h2>' +
     '<div class="opts ' + (Q.t === 'vf' ? 'vf' : '') + '">' + Q.opts.map((o, i) => '<button class="opt" data-i="' + i + '" type="button"><span class="key">' + letras[i] + '</span><span>' + esc(o.txt) + '</span></button>').join('') + '</div>' +
     '<div class="fb" hidden></div></article>';
   const btns = Array.from(ctx.body.querySelectorAll('.opt'));
+  if (op.escolhido != null && btns[op.escolhido]) btns[op.escolhido].classList.add('picked');
   let feito = false;
   btns.forEach(b => b.onclick = () => {
     if (feito) return; feito = true;
     const i = +b.dataset.i, ok = Q.opts[i].ok;
-    btns.forEach(x => x.disabled = true);
+    btns.forEach(x => { x.disabled = true; x.classList.remove('picked'); });
     if (teste){ b.classList.add('picked'); setTimeout(() => done(ok, Q, i), 320); return; }
+    if (op.onResp) op.onResp(ok, Q, i);
     const ci = Q.opts.findIndex(o => o.ok);
     btns[ci].classList.add('right'); if (!ok) b.classList.add('wrong');
     const blank = ctx.body.querySelector('.blank');
@@ -1663,28 +1695,94 @@ function telaPergunta(ctx, it, done){
   });
 }
 
-/* ---------- Sequência de passos (mundos, minijogos, teste) ---------- */
+function nomeMini(p){
+  if (p.k === 'sprint') return C.classificar[p.set].titulo;
+  if (p.k === 'ligar') return C.ligar[p.set].titulo;
+  if (p.k === 'ordem') return C.ordenar[p.set].titulo;
+  if (p.k === 'mapa') return C.figuras[p.set].titulo;
+  return 'Desafio';
+}
+/* Um passo já feito: a tua resposta, a certa e a explicação (ou a matéria, ou o texto que escreveste) */
+function htmlRevisto(x, titulo){
+  if (x.p && x.p.k === 'licao'){
+    const L = C.licoes[x.p.n], secs = [].concat(x.p.i).map(i => L.seccoes[i]).filter(Boolean);
+    return '<article class="mini pop-in parte"><p class="tag">' + esc(titulo) + ' · matéria, parte ' + x.p.parte + ' de ' + x.p.de + '</p>' + (x.p.parte === 1 ? '<p class="li-ideia">' + L.ideia + '</p>' : '') + '<div class="licao">' + secs.map(htmlSeccao).join('') + '</div>' + (x.p.parte === x.p.de ? '<p class="li-truque"><b>Truque:</b> ' + L.truque + '</p>' : '') + '</article>';
+  }
+  if (x.p && x.p.k === 'escrita'){
+    const dev = (C.escritas || []).find(e => e.id === x.p.id) || { pergunta:'', modelo:'' };
+    return '<article class="mini pop-in"><p class="tag">' + esc(titulo) + ' · resposta escrita</p><h2 class="qtext longa">' + esc(dev.pergunta) + '</h2>' +
+      (x.texto != null ? '<p class="col-h">A tua resposta</p><div class="caixa">' + (x.texto ? esc(x.texto) : '<span class="muted">(sem resposta)</span>') + '</div>' : '') +
+      '<p class="col-h">Resposta-modelo</p><div class="caixa modelo">' + esc(dev.modelo) + '</div><p class="fb-msg">Marcaste ' + Math.round(x.c * 100) + '% dos pontos.</p></article>';
+  }
+  if (!x.Q) return '<article class="mini pop-in"><p class="tag">' + esc(titulo) + '</p><h2 class="qtext">' + esc(nomeMini(x.p)) + '</h2><p class="fb-msg">Já feito: ' + Math.round(x.c * 100) + '% certo.</p></article>';
+  const Q = x.Q, letras = Q.t === 'vf' ? ['V','F'] : ['A','B','C','D'], it = ITENS[Q.id];
+  return '<article class="q pop-in"><p class="tag">' + esc(titulo) + '</p>' + (it && it.doc ? htmlDoc(it.doc, false) : '') + '<h2 class="qtext' + (Q.q.length > 150 ? ' longa' : '') + '">' + fmtQ(Q.q) + '</h2><div class="opts' + (Q.t === 'vf' ? ' vf' : '') + '">' +
+    Q.opts.map((o, i) => '<button class="opt' + (o.ok ? ' right' : i === x.i ? ' wrong' : '') + '" type="button" disabled><span class="key">' + letras[i] + '</span><span>' + esc(o.txt) + (i === x.i ? ' <b>← a tua resposta</b>' : '') + '</span></button>').join('') + '</div>' +
+    '<div class="fb ' + (x.ok ? 'is-ok' : 'is-bad') + '"><p class="fb-msg">' + (x.ok ? 'Acertaste.' : 'Erraste.') + '</p>' + (Q.e ? '<p class="fb-e">' + esc(Q.e) + '</p>' : '') + '</div></article>';
+}
+/* Lista de todas as respostas, no fim de um mundo ou de um teste */
+function htmlRespostas(res, titulo){
+  res = res.filter(x => !(x.p && x.p.k === 'licao'));
+  const qs = res.filter(x => x.Q); if (!res.length) return '';
+  return '<details class="respostas"><summary>' + esc(titulo) + (qs.length ? ' (' + qs.filter(x => x.ok).length + ' de ' + qs.length + ' certas)' : '') + '</summary><div class="revlist">' +
+    res.map((x, j) => x.Q
+      ? '<div class="revitem ' + (x.ok ? 'ok' : 'mal') + '"><p class="qq">' + (j + 1) + '. ' + (x.ok ? '✓ ' : '✗ ') + esc(x.Q.q.replace('___', '______')) + '</p><p class="' + (x.ok ? 'ce' : 'tu') + '">A tua resposta: ' + esc(x.Q.opts[x.i].txt) + '</p>' +
+        (x.ok ? '' : '<p class="ce">Resposta certa: ' + esc(x.Q.opts.find(o => o.ok).txt) + '</p>') + (x.Q.e ? '<p>' + esc(x.Q.e) + '</p>' : '') + '</div>'
+      : '<div class="revitem"><p class="qq">' + (j + 1) + '. ' + (x.p && x.p.k === 'escrita' ? 'Resposta escrita' : 'Desafio: ' + esc(nomeMini(x.p))) + '</p><p>' + Math.round(x.c * 100) + (x.p && x.p.k === 'escrita' ? '% dos pontos' : '% certo') + '</p></div>').join('') + '</div></details>';
+}
+
+/* ---------- Sequência de passos (mundos, minijogos, teste) ----------
+   ← (ou o «voltar» do telemóvel) mostra os passos já feitos. No teste final pode mudar-se a resposta. */
 function jogar(titulo, passos, fim, modo, chave, materiaN){
   const ctx = palco(titulo, modo, chave, materiaN);
-  let k = 0, cred = 0, res = [], xp0 = S.xp;
+  const teste = modo === 'teste';
+  let k = 0, res = [], xp0 = S.xp, pend = null; // pend: pergunta atual já respondida, à espera de «Continuar»
   const sv = chave && S.prog[chave];
-  if (sv){ passos = sv.passos.map(desPasso); k = sv.k; cred = sv.cred; xp0 = S.xp - (sv.xp || 0); res = sv.res.map((x, j) => desRes(x, passos[j])); }
-  const gravar = () => { if (chave){ S.prog[chave] = { passos:passos.map(serPasso), k, cred, xp:S.xp - xp0, res:res.map(serRes) }; guardar(); } };
+  if (sv){ passos = sv.passos.map(desPasso); k = sv.k; xp0 = S.xp - (sv.xp || 0); res = sv.res.map((x, j) => desRes(x, passos[j])); }
+  const cred = () => res.reduce((t, x) => t + x.c, 0);
   const conta = () => passos.filter(p => p.k !== 'licao').length; // as partes de matéria não contam para a nota
-  const passo = () => {
-    topo(); document.body.classList.remove('foco');
-    if (k >= passos.length){ if (chave){ delete S.prog[chave]; guardar(); } return fim({ cred, total:conta(), res, xp:S.xp - xp0 }); }
+  const gravar = () => { if (chave){ S.prog[chave] = { passos:passos.map(serPasso), k, cred:cred(), xp:S.xp - xp0, res:res.map(serRes) }; guardar(); } };
+  const pararTimers = () => { TIMERS.forEach(clearInterval); TIMERS = []; };
+  const recuar = j => { if (j > 0) mostrar(j - 1); else ctx.sair(); };
+  const done = (c, extra) => { pend = null; res.push(Object.assign({ p:passos[k], c }, extra || {})); k++; gravar(); passo(); };
+  function passo(){
+    topo(); document.body.classList.remove('foco'); ctx.setMateria(materiaN);
+    if (k >= passos.length){ if (chave){ delete S.prog[chave]; guardar(); } return fim({ cred:cred(), total:conta(), res, xp:S.xp - xp0 }); }
     ctx.prog(k / passos.length, (k + 1) + '/' + passos.length);
+    ctx.setAnterior(k > 0, () => mostrar(k - 1));
+    ctx.setVoltar(() => recuar(k));
     const p = passos[k];
-    const done = (c, extra) => { cred += c; res.push(Object.assign({ p, c }, extra || {})); k++; gravar(); passo(); };
     if (p.k === 'licao') telaParte(ctx, p, passos[k + 1], () => done(0));
-    else if (p.k === 'q') telaPergunta(ctx, p.it, (ok, Q, i) => done(ok ? 1 : 0, { ok, Q, i }));
+    else if (p.k === 'q'){
+      if (pend){
+        ctx.body.innerHTML = htmlRevisto(pend, 'Pergunta ' + (k + 1)) + '<div class="acts"><button class="btn primary" id="rv-cont" type="button">Continuar</button></div>';
+        $('#rv-cont').onclick = () => done(pend.ok ? 1 : 0, pend); return;
+      }
+      telaPergunta(ctx, p.it, (ok, Q, i) => done(ok ? 1 : 0, { ok, Q, i }), { onResp:(ok, Q, i) => { pend = { ok, Q, i, p }; } });
+    }
     else if (p.k === 'escrita') telaEscrita(ctx, p.id, done);
     else if (p.k === 'ordem') telaOrdem(ctx, p.set, done);
     else if (p.k === 'mapa') telaMapa(ctx, p.set, null, null, c => done(c));
     else if (p.k === 'ligar') telaLigar(ctx, p.set, done);
     else if (p.k === 'sprint') telaSprint(ctx, p.set, done);
-  };
+  }
+  function mostrar(j){
+    pararTimers(); topo();
+    const x = res[j], ultimo = j + 1 >= k, ehMateria = x.p && x.p.k === 'licao';
+    document.body.classList.toggle('foco', !!ehMateria); ctx.setMateria(ehMateria ? 0 : materiaN);
+    const seguinte = () => ultimo ? passo() : mostrar(j + 1);
+    const txtSeg = ultimo ? 'Voltar ao passo onde ias →' : 'Seguinte →';
+    ctx.prog(j / passos.length, (j + 1) + '/' + passos.length);
+    ctx.setAnterior(j > 0, () => mostrar(j - 1));
+    ctx.setVoltar(() => recuar(j));
+    if (teste && x.Q){ // no teste podes mudar a resposta, como num teste em papel
+      telaPergunta(ctx, x.p.it, (ok, Q, i) => { Object.assign(x, { ok, Q, i, c:ok ? 1 : 0 }); gravar(); seguinte(); }, { Q:x.Q, escolhido:x.i, tag:'Pergunta ' + (j + 1) + ' · podes mudar a resposta' });
+      ctx.body.querySelector('.q').insertAdjacentHTML('beforeend', '<div class="acts"><button class="btn ghost" id="rv-seg" type="button">' + (ultimo ? txtSeg : 'Seguinte sem mudar →') + '</button></div>');
+    } else {
+      ctx.body.innerHTML = htmlRevisto(x, 'Passo ' + (j + 1) + (ehMateria ? '' : ' · já feito')) + '<div class="acts"><button class="btn primary" id="rv-seg" type="button">' + txtSeg + '</button></div>';
+    }
+    $('#rv-seg').onclick = seguinte;
+  }
   passo();
 }
 
@@ -1732,6 +1830,7 @@ function telaInicioMundo(n){
     '<button class="btn primary big" id="mi-go" type="button">' + (jaJogou ? 'Jogar com a matéria' : 'Começar') + '</button>' +
     (jaJogou ? '<button class="btn ghost" id="mi-so" type="button">Já sei a matéria: só perguntas</button>' : '') + '</article></div>';
   $('#sair').onclick = inicio;
+  armarVoltar(inicio);
   $('#mi-go').onclick = () => jogarMundo(n, false);
   const so = $('#mi-so'); if (so) so.onclick = () => jogarMundo(n, true);
 }
@@ -1767,7 +1866,7 @@ function fimMundo(n, r){
   $app.innerHTML = '<div class="wrap"><section class="res pop-in"><p class="eyebrow">Mundo ' + n + ' · ' + esc(m.titulo) + '</p>' +
     estrelasHTML(est) + '<p class="big">' + Math.round(pct * 100) + '<small>%</small></p><h2>' + esc(msg) + '</h2>' +
     (abriuAgora ? '<p class="aviso">Desbloqueaste o Mundo ' + (n + 1) + ': <b>' + esc(C.mundos[n].titulo) + '</b></p>' : '') +
-    '<div class="stats"><span>+' + r.xp + ' XP</span><span>melhor: ' + Math.round(S.mundos[n].best * 100) + '%</span></div>' +
+    '<div class="stats"><span>+' + r.xp + ' XP</span><span>melhor: ' + Math.round(S.mundos[n].best * 100) + '%</span></div>' + htmlRespostas(r.res, 'Ver as tuas respostas') +
     '<div class="acts">' + (n < NM && desbloqueado(n + 1) ? '<button class="btn primary" id="r-prox" type="button">Mundo ' + (n + 1) + '</button>' : '') +
     '<button class="btn" id="r-rep" type="button">Jogar outra vez</button><button class="btn ghost" id="r-ini" type="button">Voltar ao mapa</button></div></section></div>';
   const prox = $('#r-prox'); if (prox) prox.onclick = () => jogarMundo(n + 1);
@@ -1937,30 +2036,46 @@ function revisao(){
   }
   combo = 0;
   const ctx = palco('Revisão dos erros');
-  const totalIni = ids.length;
-  let fila = baralhar(ids);
-  const passo = () => {
+  const totalIni = ids.length, feitas = [];
+  let fila = baralhar(ids), atual = null, pend = null;
+  const concluir = (ok, Q, i) => {
+    const id = atual; feitas.push({ ok, Q, i }); atual = null; pend = null;
+    if (ok){
+      const e = S.erros[id] || { s:0 }; e.s = (e.s || 0) + 1;
+      if (e.s >= 2){ delete S.erros[id]; toast('Dominada! Saiu da revisão.'); }
+      else { S.erros[id] = e; fila.splice(Math.min(fila.length, 2 + Math.floor(Math.random() * 3)), 0, id); }
+    } else {
+      fila.splice(Math.min(fila.length, 2), 0, id);
+    }
+    guardar(); passo();
+  };
+  function mostrarFeita(j){
+    topo();
+    const ultimo = j + 1 >= feitas.length;
+    ctx.setAnterior(j > 0, () => mostrarFeita(j - 1));
+    ctx.setVoltar(() => j > 0 ? mostrarFeita(j - 1) : ctx.sair());
+    ctx.body.innerHTML = htmlRevisto(feitas[j], 'Já respondida') + '<div class="acts"><button class="btn primary" id="rv-seg" type="button">' + (ultimo ? 'Voltar à pergunta onde ias →' : 'Seguinte →') + '</button></div>';
+    $('#rv-seg').onclick = () => ultimo ? passo() : mostrarFeita(j + 1);
+  }
+  function passo(){
     topo();
     const faltam = errosAtivos().length;
-    if (!fila.length || !faltam){
+    if (!atual && (!fila.length || !faltam)){
       limpar();
-      $app.innerHTML = '<div class="wrap"><section class="res pop-in"><p class="eyebrow">Revisão dos erros</p><p class="big">' + totalIni + '</p><h2>Dominaste todas as perguntas que tinhas errado!</h2><div class="acts"><button class="btn primary" id="v-ini" type="button">Voltar ao início</button></div></section></div>';
+      $app.innerHTML = '<div class="wrap"><section class="res pop-in"><p class="eyebrow">Revisão dos erros</p><p class="big">' + totalIni + '</p><h2>Dominaste todas as perguntas que tinhas errado!</h2>' + htmlRespostas(feitas, 'Ver as tuas respostas') + '<div class="acts"><button class="btn primary" id="v-ini" type="button">Voltar ao início</button></div></section></div>';
       $('#v-ini').onclick = inicio; confetis(); return;
     }
     ctx.prog((totalIni - faltam) / totalIni, 'faltam ' + faltam);
-    const id = fila.shift();
-    ctx.setMateria(ITENS[id].m);
-    telaPergunta(ctx, ITENS[id], ok => {
-      if (ok){
-        const e = S.erros[id] || { s:0 }; e.s = (e.s || 0) + 1;
-        if (e.s >= 2){ delete S.erros[id]; toast('Dominada! Saiu da revisão.'); }
-        else { S.erros[id] = e; fila.splice(Math.min(fila.length, 2 + Math.floor(Math.random() * 3)), 0, id); }
-      } else {
-        fila.splice(Math.min(fila.length, 2), 0, id);
-      }
-      guardar(); passo();
-    });
-  };
+    ctx.setAnterior(feitas.length > 0, () => mostrarFeita(feitas.length - 1));
+    ctx.setVoltar(() => feitas.length ? mostrarFeita(feitas.length - 1) : ctx.sair());
+    if (!atual) atual = fila.shift();
+    ctx.setMateria(ITENS[atual].m);
+    if (pend){
+      ctx.body.innerHTML = htmlRevisto(pend, 'Pergunta atual') + '<div class="acts"><button class="btn primary" id="rv-cont" type="button">Continuar</button></div>';
+      $('#rv-cont').onclick = () => concluir(pend.ok, pend.Q, pend.i); return;
+    }
+    telaPergunta(ctx, ITENS[atual], concluir, { onResp:(ok, Q, i) => { pend = { ok, Q, i }; } });
+  }
   passo();
 }
 
@@ -1991,6 +2106,7 @@ function fimTeste(r){
         const certa = x.Q.opts.find(o => o.ok).txt;
         return '<div class="revitem"><p class="qq">' + esc(x.Q.q.replace('___', '______')) + '</p><p class="tu">A tua resposta: ' + esc(x.Q.opts[x.i].txt) + '</p><p class="ce">Resposta certa: ' + esc(certa) + '</p>' + (x.Q.e ? '<p>' + esc(x.Q.e) + '</p>' : '') + '</div>';
       }).join('') + '</div>' : '') +
+      htmlRespostas(r.res, 'Ver todas as respostas') +
       '<div class="acts"><button class="btn primary" id="t-rep" type="button">Fazer outro teste</button>' + (erradas.length ? '<button class="btn" id="t-rev" type="button">Rever os erros</button>' : '') + '<button class="btn ghost" id="t-ini" type="button">Início</button></div></section></div>';
     $('#t-rep').onclick = testeFinal;
     const rv = $('#t-rev'); if (rv) rv.onclick = revisao;
@@ -2169,6 +2285,9 @@ function simulacao(){
 
   function continuar(){
     topo(); mostrarProg();
+    const nResp = st.r1.length + st.r2.length + st.r3.length;
+    ctx.setAnterior(nResp > 0, () => verSim(nResp - 1));
+    ctx.setVoltar(() => nResp > 0 ? verSim(nResp - 1) : ctx.sair());
     const f = faseSim(st)[0];
     if (f === 'q1') return pergunta(0, st.g1, st.r1);
     if (f === 'q2') return pergunta(1, st.g2, st.r2);
@@ -2182,6 +2301,21 @@ function simulacao(){
     const d = SIM.extensas.find(x => x.id === st.ext);
     titulo('Simulação · Grupo VII · Resposta extensa');
     telaDesenvolvimento(ctx, d, est(st.ext), gravar, fim, G[6].nome, G[6].cotacao, true);
+  }
+  function verSim(j){ // rever e, se quiseres, mudar uma resposta dos grupos I a III
+    topo();
+    const gi = j < G[0].n ? 0 : j < G[0].n + G[1].n ? 1 : 2, base = gi === 0 ? 0 : gi === 1 ? G[0].n : G[0].n + G[1].n;
+    const idx = j - base, lista = gi === 0 ? st.g1 : gi === 1 ? st.g2 : st.g3, dest = gi === 0 ? st.r1 : gi === 1 ? st.r2 : st.r3;
+    const it = ITENS[lista[idx]], Q = preparar(it), antes = Q.opts.findIndex(o => o.txt === dest[idx].esc);
+    const nResp = st.r1.length + st.r2.length + st.r3.length, ultimo = j + 1 >= nResp;
+    const seguinte = () => ultimo ? continuar() : verSim(j + 1);
+    titulo('Simulação · ' + G[gi].nome + ' · a rever');
+    ctx.setAnterior(j > 0, () => verSim(j - 1));
+    ctx.setVoltar(() => j > 0 ? verSim(j - 1) : ctx.sair());
+    telaPergunta(ctx, it, (ok, Q2, i) => { dest[idx] = { id:Q2.id, ok, esc:Q2.opts[i].txt }; gravar(); seguinte(); },
+      { Q, escolhido:antes, tag:G[gi].nome + ' · ' + (idx + 1) + ' de ' + lista.length + ' · podes mudar a resposta' });
+    ctx.body.querySelector('.q').insertAdjacentHTML('beforeend', '<div class="acts"><button class="btn ghost" id="rv-seg" type="button">' + (ultimo ? 'Voltar ao passo onde ias →' : 'Seguinte sem mudar →') + '</button></div>');
+    $('#rv-seg').onclick = seguinte;
   }
   function est(id){ if (!st.dev[id]) st.dev[id] = { texto:'', submetido:false, marcados:[], feito:false }; return st.dev[id]; }
   function pergunta(gi, lista, dest){
@@ -2229,6 +2363,7 @@ function simulacao(){
         (mapaErr.length ? '<p class="col-h">Grupo V · legendas erradas</p><div class="revitem">' + mapaErr.map(x => '<p>• Puseste «' + esc(x.r || '—') + '»; era <b>' + esc(x.certo) + '</b></p>').join('') + '</div>' : '') +
         (faltou ? '<p class="col-h">Grupos VI e VII · pontos que faltaram</p>' + faltou : '') +
       '</div>' +
+      htmlRespostas(R.g1.concat(R.g2, R.g3).map(x => Object.assign({ c:x.ok ? 1 : 0 }, x)), 'Ver todas as respostas dos grupos I a III') +
       '<div class="acts"><button class="btn primary" id="s-rep" type="button">Fazer outra simulação</button>' + (e1.length + e2.length + e3.length ? '<button class="btn" id="s-rev" type="button">Rever os erros</button>' : '') + '<button class="btn ghost" id="s-ini" type="button">Início</button></div></section></div>';
     $('#s-rep').onclick = simulacao;
     const rv = $('#s-rev'); if (rv) rv.onclick = revisao;
@@ -2246,7 +2381,8 @@ function telaEscrita(ctx, id, done){
   telaDesenvolvimento(ctx, dev, st, guardar, () => {
     const c = st.marcados.length / dev.pontos.length;
     if (c >= 0.99) acerto(); else if (c < 0.5) erro();
-    delete S.rascunhos[id]; guardar(); done(c);
+    const fez = { texto:st.texto, marcados:st.marcados.slice() };
+    delete S.rascunhos[id]; guardar(); done(c, fez);
   }, 'Resposta escrita', null, false);
 }
 
@@ -2355,10 +2491,12 @@ function materia(n){
     '<div class="pb-mid"><p class="pb-title">Matéria toda</p><div class="bar"><i style="width:' + (n / NM * 100) + '%"></i></div></div><span></span><span class="pb-right">' + n + '/' + NM + '</span></header>' +
     '<div class="filtros">' + C.mundos.map(x => '<button class="mini-b' + (x.n === n ? ' on' : '') + '" data-n="' + x.n + '" type="button" aria-pressed="' + (x.n === n) + '"><span class="gr">' + x.letra + '</span> ' + esc(x.curto) + '</button>').join('') + '</div>' +
     '<article class="mini pop-in"><p class="tag">Mundo ' + n + '</p><h2 class="qtext">' + esc(m.titulo) + '</h2>' + htmlLicao(n) +
-    '<div class="acts"><button class="btn" id="mt-cart" type="button">Cartões deste tema</button>' +
+    '<div class="acts">' + (n > 1 ? '<button class="btn ghost" id="mt-ant" type="button">← Matéria anterior</button>' : '') + '<button class="btn" id="mt-cart" type="button">Cartões deste tema</button>' +
     (desbloqueado(n) ? '<button class="btn primary" id="mt-jogar" type="button">Jogar o Mundo ' + n + '</button>' : '') +
     (n < NM ? '<button class="btn ghost" id="mt-prox" type="button">Matéria seguinte →</button>' : '') + '</div></article></div>';
   $('#sair').onclick = inicio;
+  armarVoltar(n > 1 ? () => materia(n - 1) : inicio);
+  const ma = $('#mt-ant'); if (ma) ma.onclick = () => materia(n - 1);
   $app.querySelectorAll('[data-n]').forEach(b => b.onclick = () => materia(+b.dataset.n));
   $('#mt-cart').onclick = () => cartoes('m' + n);
   const j = $('#mt-jogar'); if (j) j.onclick = () => jogarMundo(n);
@@ -2379,6 +2517,7 @@ function cartoes(filtro){
   const filtros = [['todos','Todos'], ['abertas','Respostas abertas'], ['conceitos','Conceitos']].concat(C.mundos.map(m => ['m' + m.n, m.letra + ' ' + m.curto]));
 
   $app.innerHTML = '<div class="wrap" style="gap:14px"><header class="playbar"><button class="icon-btn" id="sair" type="button" aria-label="Sair para o início">✕</button>' +
+    '<button class="icon-btn" id="cant" type="button" aria-label="Ver o cartão anterior" title="Cartão anterior" hidden>←</button>' +
     '<div class="pb-mid"><p class="pb-title">Cartões de estudo</p><div class="bar"><i id="pbar"></i></div></div><span></span><div class="pb-right"><span id="pcount"></span></div></header>' +
     '<div class="filtros">' + filtros.map(f => '<button class="mini-b ' + (f[0] === filtro ? 'on' : '') + '" data-f="' + f[0] + '" type="button" aria-pressed="' + (f[0] === filtro) + '">' + esc(f[1]) + '</button>').join('') + '</div>' +
     (porTema ? '<p class="aviso">Primeiro lê a matéria deste tema e só depois tenta os cartões. <button class="link-b" id="c-ler" type="button">Ler a matéria do Mundo ' + tema + '</button></p>' : '') +
@@ -2388,9 +2527,23 @@ function cartoes(filtro){
   const ler = $('#c-ler'); if (ler) ler.onclick = () => abrirMateria(tema);
   const stage = $('#stage');
 
+  const vistos = [], pa = $('#cant');
+  const armar = (pode, fn) => { pa.hidden = !pode; pa.onclick = fn; armarVoltar(pode ? fn : inicio); };
+  function verCartao(j){ // rever um cartão que já passou
+    const c = vistos[j], ultimo = j + 1 >= vistos.length; let v = false;
+    armar(j > 0, () => verCartao(j - 1));
+    stage.innerHTML = '<p class="small muted">Cartão que já viste (' + (j + 1) + ' de ' + vistos.length + ')</p><div class="cartao"><button class="face pop-in" id="face" type="button" aria-label="Virar cartão">' + frente(c) + '</button></div>' +
+      '<div class="acts"><button class="btn primary" id="cv-seg" type="button">' + (ultimo ? 'Voltar ao cartão onde ias →' : 'Seguinte →') + '</button></div>' +
+      '<button class="btn ghost" id="c-mat" type="button">Ler a matéria deste tema (Mundo ' + c.m + ')</button>';
+    const face = $('#face');
+    face.onclick = () => { v = !v; face.innerHTML = v ? verso(c) : frente(c); face.classList.toggle('verso', v); };
+    $('#cv-seg').onclick = () => ultimo ? render() : verCartao(j + 1);
+    $('#c-mat').onclick = () => abrirMateria(c.m);
+  }
   const atualizar = () => { $('#pbar').style.width = (sabidos() / lista.length * 100) + '%'; $('#pcount').textContent = sabidos() + '/' + lista.length; };
   const render = () => {
     atualizar(); virado = false;
+    armar(vistos.length > 0, () => verCartao(vistos.length - 1));
     if (!fila.length){
       stage.innerHTML = '<section class="res pop-in"><p class="eyebrow">Baralho terminado</p><p class="big">' + sabidos() + '<small>/' + lista.length + '</small></p><h2>Já sabes ' + sabidos() + ' de ' + lista.length + ' cartões.</h2>' +
         '<div class="acts"><button class="btn primary" id="c-rep" type="button">Recomeçar baralho</button><button class="btn ghost" id="c-ini" type="button">Início</button></div></section>';
@@ -2415,9 +2568,9 @@ function cartoes(filtro){
       face.classList.toggle('verso', virado); face.classList.remove('flip-out');
       if (virado && !$('#c-acts').children.length){
         $('#c-acts').innerHTML = '<button class="btn" id="c-rev" type="button">Rever outra vez</button><button class="btn primary" id="c-sei" type="button">Já sei</button>';
-        $('#c-sei').onclick = () => { S.cartoes[c.id] = 1; guardar(); fila.shift(); fila = fila.filter(x => x !== c); render(); };
+        $('#c-sei').onclick = () => { vistos.push(c); S.cartoes[c.id] = 1; guardar(); fila.shift(); fila = fila.filter(x => x !== c); render(); };
         $('#c-rev').onclick = () => {
-          S.cartoes[c.id] = 0; guardar(); fila.shift();
+          vistos.push(c); S.cartoes[c.id] = 0; guardar(); fila.shift();
           fila.splice(Math.min(fila.length, 3), 0, c);
           if (fila.length > 6) fila.push(c);
           render();

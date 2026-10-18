@@ -26,6 +26,7 @@ Tudo fica guardado no browser (`localStorage`, chave `rota-do-mar-v1`):
 
 - XP, estrelas, recordes, erros para rever e cartões que já sabes
 - **Jogos a meio**: mundos, teste final e simulação (incluindo as legendas do mapa e o texto das respostas escritas, guardado enquanto se escreve). Ao sair com ✕, continua-se depois no mesmo sítio
+- **Voltar atrás**: o botão **←** na barra de cima mostra os passos já feitos (partes de matéria, perguntas com a tua resposta, a certa e a explicação, respostas escritas, desafios). No teste final e na simulação (grupos I a III) pode-se voltar e **mudar a resposta**. O botão «voltar» do telemóvel recua um passo em vez de sair do jogo. No fim de cada mundo, do teste final, da simulação e da revisão dos erros há «Ver as tuas respostas»; nos cartões o ← mostra os anteriores e na matéria há «← Matéria anterior»
 - **Recomeçar**: botão ↺ ao lado de cada mundo (com confirmação no ecrã; os mundos já abertos continuam abertos), e no início, com dois toques, recomeçar o teste final ou a simulação, limpar a revisão dos erros ou pôr os cartões como «por saber». «Apagar todo o progresso» apaga tudo menos as definições
 
 ## Onde está cada coisa
