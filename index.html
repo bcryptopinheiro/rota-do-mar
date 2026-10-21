@@ -1434,7 +1434,7 @@ addEventListener('popstate', () => {
 
 /* ---------- Estado dos mundos ---------- */
 function infoMundo(n){ return S.mundos[n] || { best:0, est:0 }; }
-function desbloqueado(n){ return n === 1 || S.abertos.indexOf(n) >= 0 || infoMundo(n - 1).best >= 0.7; }
+function desbloqueado(n){ return true; }
 function temProgresso(n){ return !!S.mundos[n] || !!S.prog['m' + n]; }
 /* Recomeçar um mundo: apaga as estrelas e a pergunta onde se ia; os mundos já abertos continuam abertos */
 function recomecarMundo(n){
